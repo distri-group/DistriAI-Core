@@ -1,7 +1,7 @@
 # DistriAI-Program-Solana
 
 ## Run in Solana Playground
-https://beta.solpg.io/658bca32cffcf4b13384ceb1
+https://beta.solpg.io/658bd95fcffcf4b13384ceb2
 
 or
 

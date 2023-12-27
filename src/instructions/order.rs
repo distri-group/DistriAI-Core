@@ -8,7 +8,7 @@ use crate::errors::DistriAIError;
 use crate::state::machine::*;
 use crate::state::order::*;
 
-const MINT_PUBKEY: Pubkey = pubkey!("H6coSD72RKQS2v1oPbrm3mhoQvNxbKEgAVZk1r5Z9qhT");
+const MINT_PUBKEY: Pubkey = pubkey!("896KfVVY6VRGQs1d9CKLnKUEgXXCCJcEEg7LwSK84vWE");
 
 pub fn place_order(
     ctx: Context<PlaceOrder>,
