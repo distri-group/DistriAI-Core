@@ -58,6 +58,7 @@ pub fn place_order(
     order.total = total;
     order.metadata = metadata;
     order.status = OrderStatus::Training;
+    order.order_time = Clock::get()?.unix_timestamp;
 
     emit!(OrderEvent {
         order_id: order.order_id,
@@ -120,6 +121,13 @@ pub fn order_completed(ctx: Context<OrderCompleted>, metadata: String, score: u8
     let order = &mut ctx.accounts.order;
     require!(
         order.status == OrderStatus::Training,
+        DistriAIError::IncorrectStatus
+    );
+    let now_ts = Clock::get()?.unix_timestamp;
+    let order_endtime = order.order_time.saturating_add(order.duration.saturating_mul(3600).into());
+    require_gte!(
+        now_ts,
+        order_endtime,
         DistriAIError::IncorrectStatus
     );
     order.metadata = metadata;
