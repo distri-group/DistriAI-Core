@@ -15,9 +15,10 @@ or
 - devnet: HF4aT6sho2zTySB8nEeN5ThMvDGtGVRrH3jeBvxFNxit
 
 ### Test in Solana Playground
-![image](https://github.com/distri-group/DistriAI-Core-Solana/assets/96568736/a0976a48-694d-4f69-9d64-834901943ab8)
+
+![39F192EA-80DA-4EA1-9DD3-10873F9EFED2](https://github.com/distri-group/DistriAI-Core-Solana/assets/96568736/efd8fdd1-eb93-44ca-86d2-5c18486e7165)
 
 1. Switch to `BUILD & DEPLOY`
-1. Change Program id.
+1. Change program id.
 1. Click `Build`
 1. Switch to `Test`
