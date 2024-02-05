@@ -1,5 +1,5 @@
 # DistriAI-Core-Solana
-This repository contains the core Solana program for the Distri.AI.
+This repository contains the core Solana program for the DistriAI.
 
 ## Development
 ### Run in Solana Playground

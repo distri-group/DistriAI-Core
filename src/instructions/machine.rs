@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::errors::DistriAIError;
 use crate::state::machine::*;
-
+// Adding the information of a machine to the system
 pub fn add_machine(ctx: Context<AddMachine>, uuid: [u8; 16], metadata: String) -> Result<()> {
     require_gte!(
         Machine::METADATA_MAX_LENGTH,
