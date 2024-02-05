@@ -111,6 +111,66 @@ pub fn renew_order(ctx: Context<RenewOrder>, duration: u32) -> Result<()> {
     Ok(())
 }
 
+pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {
+    let order = &mut ctx.accounts.order;
+    require!(
+        order.status == OrderStatus::Training,
+        DistriAIError::IncorrectStatus
+    );
+
+    let now_ts = Clock::get()?.unix_timestamp;
+    let used_duration: u32 = now_ts.saturating_sub(order.order_time).saturating_div(3600).saturating_add(1)
+                                    .try_into().unwrap();
+    require_gt!(
+        order.duration,
+        used_duration,
+        DistriAIError::IncorrectStatus
+    );
+    order.status = OrderStatus::Refunded;
+    order.refund_time = now_ts;
+
+    let machine = &mut ctx.accounts.machine;
+    machine.status = MachineStatus::ForRent;
+    machine.completed_count = machine.completed_count.saturating_add(1);
+
+    // Transfer token from vault to seller
+    let used_total = order.price.saturating_mul(used_duration.into());
+    let mint_key = ctx.accounts.mint.key();
+    let signer: &[&[&[u8]]] = &[&[b"vault", mint_key.as_ref(), &[ctx.bumps.vault]]];
+    let cpi_context_seller = CpiContext::new_with_signer(
+        ctx.accounts.token_program.to_account_info(),
+        TransferChecked {
+            from: ctx.accounts.vault.to_account_info(),
+            mint: ctx.accounts.mint.to_account_info(),
+            to: ctx.accounts.seller_ata.to_account_info(),
+            authority: ctx.accounts.vault.to_account_info(),
+        },
+        signer,
+    );
+    transfer_checked(cpi_context_seller, used_total, ctx.accounts.mint.decimals)?;
+
+    // Transfer token from vault to seller
+    let cpi_context_seller = CpiContext::new_with_signer(
+        ctx.accounts.token_program.to_account_info(),
+        TransferChecked {
+            from: ctx.accounts.vault.to_account_info(),
+            mint: ctx.accounts.mint.to_account_info(),
+            to: ctx.accounts.buyer_ata.to_account_info(),
+            authority: ctx.accounts.vault.to_account_info(),
+        },
+        signer,
+    );
+    transfer_checked(cpi_context_seller, order.total.saturating_sub(used_total), ctx.accounts.mint.decimals)?;
+
+    emit!(OrderEvent {
+        order_id: order.order_id,
+        buyer: order.buyer,
+        seller: order.seller,
+        machine_id: order.machine_id,
+    });
+    Ok(())
+}
+
 pub fn order_completed(ctx: Context<OrderCompleted>, metadata: String, score: u8) -> Result<()> {
     require_gte!(
         Order::METADATA_MAX_LENGTH,
@@ -310,6 +370,53 @@ pub struct RenewOrder<'info> {
     pub mint: Account<'info, Mint>,
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
+}
+
+#[derive(Accounts)]
+pub struct RefundOrder<'info> {
+    #[account(
+        mut,
+        constraint = machine.uuid == order.machine_id && machine.owner == order.seller
+    )]
+    pub machine: Account<'info, Machine>,
+
+    #[account(
+        mut,
+        has_one = buyer
+    )]
+    pub order: Account<'info, Order>,
+
+    #[account(mut)]
+    pub buyer: Signer<'info>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = buyer
+    )]
+    pub buyer_ata: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = order.seller
+    )]
+    pub seller_ata: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        seeds = [b"vault", mint.key().as_ref()],
+        bump
+    )]
+    pub vault: Account<'info, TokenAccount>,
+
+    #[account(
+        address = MINT_PUBKEY
+    )]
+    pub mint: Account<'info, Mint>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]

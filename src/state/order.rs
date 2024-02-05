@@ -21,10 +21,12 @@ pub struct Order {
     pub status: OrderStatus, // 1 + 1
     /// The order time of this order.
     pub order_time: i64, // 8
+    /// The refund time of this order.
+    pub refund_time: i64, // 8
 }
 
 impl Order {
-    pub const MAXIMUM_SIZE: usize = 16 + 32 + 32 + 16 + 8 + 4 + 8 + (4 + 2048) + (1 + 1) + 8;
+    pub const MAXIMUM_SIZE: usize = 16 + 32 + 32 + 16 + 8 + 4 + 8 + (4 + 2048) + (1 + 1) + 8 + 8;
     pub const METADATA_MAX_LENGTH: usize = 2048;
 }
 
@@ -37,4 +39,6 @@ pub enum OrderStatus {
     Completed,
     /// This order was failed.
     Failed,
+    /// This order was refunded.
+    Refunded,
 }

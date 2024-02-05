@@ -8,4 +8,6 @@ pub enum DistriAIError {
     IncorrectStatus,
     /// The duration of the order exceeds the maximum available duration of the machine.
     DurationTooMuch,
+    /// Period is invalid.
+    InvalidPeriod,
 }

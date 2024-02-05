@@ -34,6 +34,10 @@ mod distri_ai {
         instructions::machine::cancel_offer(ctx)
     }
 
+    pub fn submit_task(ctx: Context<SubmitTask>, uuid: [u8; 16], period: u32, metadata: String) -> Result<()> {
+        instructions::task::submit_task(ctx, uuid, period, metadata)
+    }
+
     pub fn place_order(
         ctx: Context<PlaceOrder>,
         order_id: [u8; 16],
@@ -45,6 +49,10 @@ mod distri_ai {
 
     pub fn renew_order(ctx: Context<RenewOrder>, duration: u32) -> Result<()> {
         instructions::order::renew_order(ctx, duration)
+    }
+
+    pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {
+        instructions::order::refund_order(ctx)
     }
 
     pub fn order_completed(
