@@ -1,16 +1,16 @@
 use anchor_lang::prelude::*;
 
 #[account]
+#[derive(InitSpace)]
 pub struct Reward {
-    pub period: u32, // 4
+    pub period: u32,
     /// Reward pool in this period.
-    pub pool: u64, // 8
+    pub pool: u64,
     /// Participating machine in this period.
-    pub machine_num: u32, // 4
+    pub machine_num: u32,
 }
 
 impl Reward {
-    pub const MAXIMUM_SIZE: usize = 4 + 8 + 4;
     const GENESIS_TIME: i64 = 1706745600;
     const PERIOD_DURATION: i64 = 3600 * 24;
     const DECAY_PERIODS: u32 = 4;
@@ -25,7 +25,7 @@ impl Reward {
             .saturating_div(Reward::PERIOD_DURATION)
             .try_into()
             .unwrap();
-        return Ok(period);
+        Ok(period)
     }
 
     pub fn pool(period: u32) -> u64 {
@@ -36,23 +36,22 @@ impl Reward {
                 .saturating_mul(Reward::DECAY_RATE_NUMERATOR)
                 .saturating_div(Reward::DECAY_RATE_DENOMINATOR);
         }
-        return pool;
+        pool
     }
 }
 
 #[account]
+#[derive(InitSpace)]
 pub struct RewardMachine {
-    pub period: u32, // 4
+    pub period: u32,
     /// Machine owner.
-    pub owner: Pubkey, // 32
+    pub owner: Pubkey,
     /// Machine id.
-    pub machine_id: [u8; 16], // 16
+    pub machine_id: [u8; 16],
     /// Task number submited in this period.
-    pub task_num: u32, // 4
+    pub task_num: u32,
     /// Reward has been claimed.
-    pub claimed: bool, // 1
-}
-
-impl RewardMachine {
-    pub const MAXIMUM_SIZE: usize = 4 + 32 + 16 + 4 + 1;
+    pub claimed: bool,
+    /// Periodic reward amount.
+    pub periodic_reward: u64,
 }

@@ -7,7 +7,12 @@ pub mod state;
 
 // This is your program's public key and it will update
 // automatically when you build the project.
-declare_id!("HF4aT6sho2zTySB8nEeN5ThMvDGtGVRrH3jeBvxFNxit");
+declare_id!("B1avEmfNy4Sgncdeoo59QvYskocEyiDukXAVjpYPE4Th");
+
+pub mod dist_token {
+    use solana_program::declare_id;
+    declare_id!("896KfVVY6VRGQs1d9CKLnKUEgXXCCJcEEg7LwSK84vWE");
+}
 
 #[program]
 mod distri_ai {
@@ -34,8 +39,17 @@ mod distri_ai {
         instructions::machine::cancel_offer(ctx)
     }
 
-    pub fn submit_task(ctx: Context<SubmitTask>, uuid: [u8; 16], period: u32, metadata: String) -> Result<()> {
+    pub fn submit_task(
+        ctx: Context<SubmitTask>,
+        uuid: [u8; 16],
+        period: u32,
+        metadata: String,
+    ) -> Result<()> {
         instructions::task::submit_task(ctx, uuid, period, metadata)
+    }
+
+    pub fn claim(ctx: Context<Claim>, period: u32) -> Result<()> {
+        instructions::reward::claim(ctx, period)
     }
 
     pub fn place_order(

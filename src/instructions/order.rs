@@ -3,12 +3,10 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token::{transfer_checked, Mint, Token, TokenAccount, TransferChecked},
 };
-use solana_program::{pubkey, pubkey::Pubkey};
+use crate::dist_token;
 use crate::errors::DistriAIError;
 use crate::state::machine::*;
 use crate::state::order::*;
-
-const MINT_PUBKEY: Pubkey = pubkey!("896KfVVY6VRGQs1d9CKLnKUEgXXCCJcEEg7LwSK84vWE");
 
 pub fn place_order(
     ctx: Context<PlaceOrder>,
@@ -59,6 +57,7 @@ pub fn place_order(
     order.metadata = metadata;
     order.status = OrderStatus::Training;
     order.order_time = Clock::get()?.unix_timestamp;
+    order.refund_time = 0;
 
     emit!(OrderEvent {
         order_id: order.order_id,
@@ -300,7 +299,7 @@ pub struct PlaceOrder<'info> {
         seeds = [b"order", buyer.key().as_ref(), order_id.as_ref()],
         bump,
         payer = buyer,
-        space = 8 + Order::MAXIMUM_SIZE
+        space = 8 + Order::INIT_SPACE
     )]
     pub order: Account<'info, Order>,
 
@@ -325,7 +324,7 @@ pub struct PlaceOrder<'info> {
     pub vault: Account<'info, TokenAccount>,
     
     #[account(
-        address = MINT_PUBKEY
+        address = dist_token::ID
     )]
     pub mint: Account<'info, Mint>,
     pub token_program: Program<'info, Token>,
@@ -365,7 +364,7 @@ pub struct RenewOrder<'info> {
     pub vault: Account<'info, TokenAccount>,
 
     #[account(
-        address = MINT_PUBKEY
+        address = dist_token::ID
     )]
     pub mint: Account<'info, Mint>,
     pub token_program: Program<'info, Token>,
@@ -411,7 +410,7 @@ pub struct RefundOrder<'info> {
     pub vault: Account<'info, TokenAccount>,
 
     #[account(
-        address = MINT_PUBKEY
+        address = dist_token::ID
     )]
     pub mint: Account<'info, Mint>,
     pub token_program: Program<'info, Token>,
@@ -452,7 +451,7 @@ pub struct OrderCompleted<'info> {
     pub vault: Account<'info, TokenAccount>,
 
     #[account(
-        address = MINT_PUBKEY
+        address = dist_token::ID
     )]
     pub mint: Account<'info, Mint>,
     pub token_program: Program<'info, Token>,
@@ -492,7 +491,7 @@ pub struct OrderFailed<'info> {
     pub vault: Account<'info, TokenAccount>,
 
     #[account(
-        address = MINT_PUBKEY
+        address = dist_token::ID
     )]
     pub mint: Account<'info, Mint>,
     pub token_program: Program<'info, Token>,

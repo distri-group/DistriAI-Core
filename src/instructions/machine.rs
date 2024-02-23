@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::errors::DistriAIError;
 use crate::state::machine::*;
-// Adding the information of a machine to the system
+
 pub fn add_machine(ctx: Context<AddMachine>, uuid: [u8; 16], metadata: String) -> Result<()> {
     require_gte!(
         Machine::METADATA_MAX_LENGTH,
@@ -78,7 +78,7 @@ pub struct AddMachine<'info> {
         seeds = [b"machine", owner.key().as_ref(), uuid.as_ref()],
         bump,
         payer = owner,
-        space = 8 + Machine::MAXIMUM_SIZE
+        space = 8 + Machine::INIT_SPACE
     )]
     pub machine: Account<'info, Machine>,
 

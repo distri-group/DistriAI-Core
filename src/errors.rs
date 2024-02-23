@@ -10,4 +10,6 @@ pub enum DistriAIError {
     DurationTooMuch,
     /// Period is invalid.
     InvalidPeriod,
+    /// Reward has been claimed.
+    RepeatClaim,
 }
