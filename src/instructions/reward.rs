@@ -19,10 +19,9 @@ pub fn claim(ctx: Context<Claim>, period: u32) -> Result<()> {
     let reward_machine = &mut ctx.accounts.reward_machine;
     require!(!reward_machine.claimed, DistriAIError::RepeatClaim);
     reward_machine.claimed = true;
-    reward_machine.periodic_reward = reward.pool.saturating_div(reward.machine_num.into());
 
     let machine = &mut ctx.accounts.machine;
-    machine.claimed_periodic_rewards = machine.claimed_periodic_rewards.saturating_div(reward_machine.periodic_reward);
+    machine.claimed_periodic_rewards = machine.claimed_periodic_rewards.saturating_add(reward.unit_periodic_reward);
 
     // Transfer token from reward pool to owner
     let mint_key = ctx.accounts.mint.key();
@@ -37,7 +36,7 @@ pub fn claim(ctx: Context<Claim>, period: u32) -> Result<()> {
         },
         signer,
     );
-    transfer_checked(cpi_context, reward_machine.periodic_reward, ctx.accounts.mint.decimals)?;
+    transfer_checked(cpi_context, reward.unit_periodic_reward, ctx.accounts.mint.decimals)?;
 
     emit!(RewardEvent {
         period: reward_machine.period,

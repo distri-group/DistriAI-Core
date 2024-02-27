@@ -41,12 +41,15 @@ pub fn submit_task(
 
     let reward = &mut ctx.accounts.reward;
     reward.period = period;
-    if reward.pool == 0 {
+    if reward.start_time == 0 {
+        reward.start_time = Reward::start_time(period);
         reward.pool = Reward::pool(period);
     }
     if reward_machine.task_num == 1 {
         reward.machine_num = reward.machine_num.saturating_add(1);
     }
+    reward.unit_periodic_reward = reward.pool.saturating_div(reward.machine_num.into());
+    reward.task_num = reward.task_num.saturating_add(1);
 
     emit!(TaskEvent {
         uuid: task.uuid,

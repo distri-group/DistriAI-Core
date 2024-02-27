@@ -3,16 +3,26 @@ use anchor_lang::prelude::*;
 #[account]
 #[derive(InitSpace)]
 pub struct Reward {
+    /// Reward period.
     pub period: u32,
+    /// Start time of this reward period.
+    pub start_time: i64,
     /// Reward pool in this period.
     pub pool: u64,
-    /// Participating machine in this period.
+    /// Participating machine number in this period.
     pub machine_num: u32,
+    /// Periodic reward per machine in this period.
+    pub unit_periodic_reward: u64,
+    /// Task number in this period.
+    pub task_num: u32,
+    /// Task reward per task in this period.
+    pub unit_task_reward: u64,
 }
 
 impl Reward {
-    const GENESIS_TIME: i64 = 1706745600;
-    const PERIOD_DURATION: i64 = 3600 * 24;
+    /// Period 0 start time: 2024-02-27 00:00:00 UTC
+    const GENESIS_TIME: i64 = 1708992000;
+    const PERIOD_DURATION: i64 = 86400;
     const DECAY_PERIODS: u32 = 4;
     const DECAY_RATE_NUMERATOR: u64 = 9737;
     const DECAY_RATE_DENOMINATOR: u64 = 10000;
@@ -38,6 +48,10 @@ impl Reward {
         }
         pool
     }
+
+    pub fn start_time(period: u32) -> i64 {
+        Reward::PERIOD_DURATION.saturating_mul(period.into()).saturating_add(Reward::GENESIS_TIME)
+    }
 }
 
 #[account]
@@ -52,6 +66,4 @@ pub struct RewardMachine {
     pub task_num: u32,
     /// Reward has been claimed.
     pub claimed: bool,
-    /// Periodic reward amount.
-    pub periodic_reward: u64,
 }
