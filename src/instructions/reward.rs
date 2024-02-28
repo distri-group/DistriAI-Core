@@ -8,6 +8,20 @@ use crate::errors::DistriAIError;
 use crate::state::machine::*;
 use crate::state::reward::*;
 
+pub fn reward_pool_deposit(ctx: Context<RewardPoolDeposit>, amount: u64) -> Result<()> {
+    let cpi_context = CpiContext::new(
+        ctx.accounts.token_program.to_account_info(),
+        TransferChecked {
+            from: ctx.accounts.signer_ata.to_account_info(),
+            mint: ctx.accounts.mint.to_account_info(),
+            to: ctx.accounts.reward_pool.to_account_info(),
+            authority: ctx.accounts.signer.to_account_info(),
+        },
+    );
+    transfer_checked(cpi_context, amount, ctx.accounts.mint.decimals)?;
+    Ok(())
+}
+
 pub fn claim(ctx: Context<Claim>, period: u32) -> Result<()> {
     require_gt!(
         Reward::current_period()?,
@@ -44,6 +58,37 @@ pub fn claim(ctx: Context<Claim>, period: u32) -> Result<()> {
         machine_id: reward_machine.machine_id,
     });
     Ok(())
+}
+
+#[derive(Accounts)]
+pub struct RewardPoolDeposit<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = signer
+    )]
+    pub signer_ata: Account<'info, TokenAccount>,
+
+    #[account(
+        init_if_needed,
+        seeds = [b"reward-pool", mint.key().as_ref()],
+        bump,
+        payer = signer,
+        token::mint = mint,
+        token::authority = reward_pool
+    )]
+    pub reward_pool: Account<'info, TokenAccount>,
+
+    #[account(
+        address = dist_token::ID
+    )]
+    pub mint: Account<'info, Mint>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]

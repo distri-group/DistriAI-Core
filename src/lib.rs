@@ -48,6 +48,10 @@ mod distri_ai {
         instructions::task::submit_task(ctx, uuid, period, metadata)
     }
 
+    pub fn reward_pool_deposit(ctx: Context<RewardPoolDeposit>, amount: u64) -> Result<()> {
+        instructions::reward::reward_pool_deposit(ctx, amount)
+    }
+
     pub fn claim(ctx: Context<Claim>, period: u32) -> Result<()> {
         instructions::reward::claim(ctx, period)
     }
