@@ -3,7 +3,7 @@ This repository contains the core Solana program for the DistriAI.
 
 ## Development
 ### Run in Solana Playground
-- Open https://beta.solpg.io/6594f8d9cffcf4b13384cec6
+- Open https://beta.solpg.io/65e13668cffcf4b13384cf81
 
 or
 
@@ -12,7 +12,7 @@ or
 1. Import from local file system
 
 ### Deployments
-- devnet: HF4aT6sho2zTySB8nEeN5ThMvDGtGVRrH3jeBvxFNxit
+- devnet: 6yFTDdiS1W9T9yg6YejkwKggkEE4NYqdSSzVqQvuLn16
 
 ### Test in Solana Playground
 
