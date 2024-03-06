@@ -18,6 +18,14 @@ pub mod dist_token {
 mod distri_ai {
     use super::*;
 
+    pub fn migrate_order_new(ctx: Context<MigrationOrderNew>) -> Result<()> {
+        instructions::migration::migrate_order_new(ctx)
+    }
+
+     pub fn migrate_order_rename(ctx: Context<MigrationOrderRename>) -> Result<()> {
+        instructions::migration::migrate_order_rename(ctx)
+    }
+
     pub fn add_machine(ctx: Context<AddMachine>, uuid: [u8; 16], metadata: String) -> Result<()> {
         instructions::machine::add_machine(ctx, uuid, metadata)
     }
@@ -67,6 +75,10 @@ mod distri_ai {
 
     pub fn renew_order(ctx: Context<RenewOrder>, duration: u32) -> Result<()> {
         instructions::order::renew_order(ctx, duration)
+    }
+
+    pub fn start_order(ctx: Context<StartOrder>) -> Result<()> {
+        instructions::order::start_order(ctx)
     }
 
     pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {

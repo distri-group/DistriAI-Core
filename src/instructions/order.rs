@@ -55,7 +55,7 @@ pub fn place_order(
     order.duration = duration;
     order.total = total;
     order.metadata = metadata;
-    order.status = OrderStatus::Training;
+    order.status = OrderStatus::Preparing;
     order.order_time = Clock::get()?.unix_timestamp;
     order.refund_time = 0;
 
@@ -110,56 +110,108 @@ pub fn renew_order(ctx: Context<RenewOrder>, duration: u32) -> Result<()> {
     Ok(())
 }
 
+pub fn start_order(ctx: Context<StartOrder>) -> Result<()> {
+    let order = &mut ctx.accounts.order;
+    require!(
+        order.status == OrderStatus::Preparing,
+        DistriAIError::IncorrectStatus
+    );
+
+    order.status = OrderStatus::Training;
+    order.start_time = Clock::get()?.unix_timestamp;
+
+    emit!(OrderEvent {
+        order_id: order.order_id,
+        buyer: order.buyer,
+        seller: order.seller,
+        machine_id: order.machine_id,
+    });
+    Ok(())
+}
+
 pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {
     let order = &mut ctx.accounts.order;
     require!(
-        order.status == OrderStatus::Training,
+        order.status == OrderStatus::Preparing || order.status == OrderStatus::Training,
         DistriAIError::IncorrectStatus
     );
 
-    let now_ts = Clock::get()?.unix_timestamp;
-    let used_duration: u32 = now_ts.saturating_sub(order.order_time).saturating_div(3600).saturating_add(1)
-                                    .try_into().unwrap();
-    require_gt!(
-        order.duration,
-        used_duration,
-        DistriAIError::IncorrectStatus
-    );
-    order.status = OrderStatus::Refunded;
-    order.refund_time = now_ts;
+    if order.status == OrderStatus::Preparing {
+        order.status = OrderStatus::Refunded;
 
-    let machine = &mut ctx.accounts.machine;
-    machine.status = MachineStatus::ForRent;
-    machine.completed_count = machine.completed_count.saturating_add(1);
+        let machine = &mut ctx.accounts.machine;
+        machine.status = MachineStatus::ForRent;
+        machine.completed_count = machine.completed_count.saturating_add(1);
 
-    // Transfer token from vault to seller
-    let used_total = order.price.saturating_mul(used_duration.into());
-    let mint_key = ctx.accounts.mint.key();
-    let signer: &[&[&[u8]]] = &[&[b"vault", mint_key.as_ref(), &[ctx.bumps.vault]]];
-    let cpi_context_seller = CpiContext::new_with_signer(
-        ctx.accounts.token_program.to_account_info(),
-        TransferChecked {
-            from: ctx.accounts.vault.to_account_info(),
-            mint: ctx.accounts.mint.to_account_info(),
-            to: ctx.accounts.seller_ata.to_account_info(),
-            authority: ctx.accounts.vault.to_account_info(),
-        },
-        signer,
-    );
-    transfer_checked(cpi_context_seller, used_total, ctx.accounts.mint.decimals)?;
+        // Transfer token from vault to buyer
+        let mint_key = ctx.accounts.mint.key();
+        let signer: &[&[&[u8]]] = &[&[b"vault", mint_key.as_ref(), &[ctx.bumps.vault]]];
+        let cpi_context = CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            TransferChecked {
+                from: ctx.accounts.vault.to_account_info(),
+                mint: ctx.accounts.mint.to_account_info(),
+                to: ctx.accounts.buyer_ata.to_account_info(),
+                authority: ctx.accounts.vault.to_account_info(),
+            },
+            signer,
+        );
+        transfer_checked(cpi_context, order.total, ctx.accounts.mint.decimals)?;
+    } else {
+        let now_ts = Clock::get()?.unix_timestamp;
+        let used_duration: u32 = now_ts
+            .saturating_sub(order.start_time)
+            .saturating_div(3600)
+            .saturating_add(1)
+            .try_into()
+            .unwrap();
 
-    // Transfer token from vault to seller
-    let cpi_context_seller = CpiContext::new_with_signer(
-        ctx.accounts.token_program.to_account_info(),
-        TransferChecked {
-            from: ctx.accounts.vault.to_account_info(),
-            mint: ctx.accounts.mint.to_account_info(),
-            to: ctx.accounts.buyer_ata.to_account_info(),
-            authority: ctx.accounts.vault.to_account_info(),
-        },
-        signer,
-    );
-    transfer_checked(cpi_context_seller, order.total.saturating_sub(used_total), ctx.accounts.mint.decimals)?;
+        require_gt!(
+            order.duration,
+            used_duration,
+            DistriAIError::IncorrectStatus
+        );
+
+        order.status = OrderStatus::Refunded;
+        order.refund_time = now_ts;
+
+        let machine = &mut ctx.accounts.machine;
+        machine.status = MachineStatus::ForRent;
+        machine.completed_count = machine.completed_count.saturating_add(1);
+
+        // Transfer token from vault to seller
+        let used_total = order.price.saturating_mul(used_duration.into());
+        let mint_key = ctx.accounts.mint.key();
+        let signer: &[&[&[u8]]] = &[&[b"vault", mint_key.as_ref(), &[ctx.bumps.vault]]];
+        let cpi_context_seller = CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            TransferChecked {
+                from: ctx.accounts.vault.to_account_info(),
+                mint: ctx.accounts.mint.to_account_info(),
+                to: ctx.accounts.seller_ata.to_account_info(),
+                authority: ctx.accounts.vault.to_account_info(),
+            },
+            signer,
+        );
+        transfer_checked(cpi_context_seller, used_total, ctx.accounts.mint.decimals)?;
+
+        // Transfer token from vault to buyer
+        let cpi_context_buyer = CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            TransferChecked {
+                from: ctx.accounts.vault.to_account_info(),
+                mint: ctx.accounts.mint.to_account_info(),
+                to: ctx.accounts.buyer_ata.to_account_info(),
+                authority: ctx.accounts.vault.to_account_info(),
+            },
+            signer,
+        );
+        transfer_checked(
+            cpi_context_buyer,
+            order.total.saturating_sub(used_total),
+            ctx.accounts.mint.decimals,
+        )?;
+    }
 
     emit!(OrderEvent {
         order_id: order.order_id,
@@ -183,12 +235,10 @@ pub fn order_completed(ctx: Context<OrderCompleted>, metadata: String, score: u8
         DistriAIError::IncorrectStatus
     );
     let now_ts = Clock::get()?.unix_timestamp;
-    let order_endtime = order.order_time.saturating_add(order.duration.saturating_mul(3600).into());
-    require_gte!(
-        now_ts,
-        order_endtime,
-        DistriAIError::IncorrectStatus
-    );
+    let order_endtime = order
+        .start_time
+        .saturating_add(order.duration.saturating_mul(3600).into());
+    require_gte!(now_ts, order_endtime, DistriAIError::IncorrectStatus);
     order.metadata = metadata;
     order.status = OrderStatus::Completed;
 
@@ -234,7 +284,7 @@ pub fn order_failed(ctx: Context<OrderFailed>, metadata: String) -> Result<()> {
 
     let order = &mut ctx.accounts.order;
     require!(
-        order.status == OrderStatus::Training,
+        order.status == OrderStatus::Preparing || order.status == OrderStatus::Training,
         DistriAIError::IncorrectStatus
     );
     order.metadata = metadata;
@@ -275,7 +325,7 @@ pub fn order_failed(ctx: Context<OrderFailed>, metadata: String) -> Result<()> {
 pub fn remove_order(ctx: Context<RemoveOrder>) -> Result<()> {
     let order = &mut ctx.accounts.order;
     require!(
-        order.status != OrderStatus::Training,
+        order.status != OrderStatus::Preparing || order.status != OrderStatus::Training,
         DistriAIError::IncorrectStatus
     );
 
@@ -322,7 +372,7 @@ pub struct PlaceOrder<'info> {
         token::authority = vault
     )]
     pub vault: Account<'info, TokenAccount>,
-    
+
     #[account(
         address = dist_token::ID
     )]
@@ -369,6 +419,18 @@ pub struct RenewOrder<'info> {
     pub mint: Account<'info, Mint>,
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
+}
+
+#[derive(Accounts)]
+pub struct StartOrder<'info> {
+    #[account(
+        mut,
+        has_one = seller
+    )]
+    pub order: Account<'info, Order>,
+
+    #[account(mut)]
+    pub seller: Signer<'info>,
 }
 
 #[derive(Accounts)]
