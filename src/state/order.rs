@@ -62,10 +62,6 @@ pub struct OrderNew {
     pub refund_time: i64, // 8
 }
 
-impl OrderNew {
-    pub const METADATA_MAX_LENGTH: usize = 2048;
-}
-
 /// OrderStatus holds the current state of the order.
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq, InitSpace)]
 pub enum OrderStatus {

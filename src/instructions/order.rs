@@ -44,8 +44,6 @@ pub fn place_order(
     );
     transfer_checked(cpi_context, total, ctx.accounts.mint.decimals)?;
 
-    machine.status = MachineStatus::Renting;
-
     let order = &mut ctx.accounts.order;
     order.order_id = order_id;
     order.buyer = ctx.accounts.buyer.key();
@@ -58,6 +56,9 @@ pub fn place_order(
     order.status = OrderStatus::Preparing;
     order.order_time = Clock::get()?.unix_timestamp;
     order.refund_time = 0;
+
+    machine.status = MachineStatus::Renting;
+    machine.order_pda = order.key();
 
     emit!(OrderEvent {
         order_id: order.order_id,

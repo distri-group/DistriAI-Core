@@ -1,8 +1,10 @@
 use anchor_lang::prelude::*;
 use instructions::*;
+use migration::*;
 
 pub mod errors;
 pub mod instructions;
+pub mod migration;
 pub mod state;
 
 // This is your program's public key and it will update
@@ -17,14 +19,6 @@ pub mod dist_token {
 #[program]
 mod distri_ai {
     use super::*;
-
-    pub fn migrate_order_new(ctx: Context<MigrationOrderNew>) -> Result<()> {
-        instructions::migration::migrate_order_new(ctx)
-    }
-
-     pub fn migrate_order_rename(ctx: Context<MigrationOrderRename>) -> Result<()> {
-        instructions::migration::migrate_order_rename(ctx)
-    }
 
     pub fn add_machine(ctx: Context<AddMachine>, uuid: [u8; 16], metadata: String) -> Result<()> {
         instructions::machine::add_machine(ctx, uuid, metadata)
@@ -99,5 +93,22 @@ mod distri_ai {
 
     pub fn remove_order(ctx: Context<RemoveOrder>) -> Result<()> {
         instructions::order::remove_order(ctx)
+    }
+
+    // --------------------------------- migration ----------------------------------
+    pub fn migrate_machine_new(ctx: Context<MigrationMachineNew>) -> Result<()> {
+        migration::machine::migrate_machine_new(ctx)
+    }
+
+    pub fn migrate_machine_rename(ctx: Context<MigrationMachineRename>) -> Result<()> {
+        migration::machine::migrate_machine_rename(ctx)
+    }
+
+    pub fn migrate_order_new(ctx: Context<MigrationOrderNew>) -> Result<()> {
+        migration::order::migrate_order_new(ctx)
+    }
+
+    pub fn migrate_order_rename(ctx: Context<MigrationOrderRename>) -> Result<()> {
+        migration::order::migrate_order_rename(ctx)
     }
 }
