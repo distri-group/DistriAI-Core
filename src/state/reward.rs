@@ -26,7 +26,41 @@ impl Reward {
     const DECAY_PERIODS: u32 = 4;
     const DECAY_RATE_NUMERATOR: u64 = 9737;
     const DECAY_RATE_DENOMINATOR: u64 = 10000;
-    const GENESIS_POOL: u64 = 65_750_000_000_000;
+    // const GENESIS_POOL: u64 = 65_750_000_000_000;
+    /// Checkpoint every 10 decays
+    const POOL_CHECKPOINTS: [u64; 31] = [
+        65_750_000_000_000,
+        50_367_000_000_000,
+        38_583_000_000_000,
+        29_556_000_000_000,
+        22_641_000_000_000,
+        17_344_000_000_000,
+        13_286_000_000_000,
+        10_178_000_000_000,
+        7_797_000_000_000,
+        5_973_000_000_000,
+        4_575_000_000_000,
+        3_505_000_000_000,
+        2_685_000_000_000,
+        2_057_000_000_000,
+        1_576_000_000_000,
+        1_207_000_000_000,
+        925_000_000_000,
+        708_000_000_000,
+        543_000_000_000,
+        416_000_000_000,
+        318_000_000_000,
+        244_000_000_000,
+        187_000_000_000,
+        143_000_000_000,
+        110_000_000_000,
+        84_000_000_000,
+        64_000_000_000,
+        49_000_000_000,
+        38_000_000_000,
+        29_000_000_000,
+        22_000_000_000,
+    ];
 
     pub fn current_period() -> Result<u32> {
         let now_ts = Clock::get()?.unix_timestamp;
@@ -39,9 +73,17 @@ impl Reward {
     }
 
     pub fn pool(period: u32) -> u64 {
-        let decay_times: u32 = period.saturating_div(Reward::DECAY_PERIODS);
-        let mut pool = Reward::GENESIS_POOL;
-        for _ in 0..decay_times {
+        let decay_times: usize = period
+            .saturating_div(Reward::DECAY_PERIODS)
+            .try_into()
+            .unwrap();
+        let mut checkpoint_index: usize = decay_times.saturating_div(10).try_into().unwrap();
+        if checkpoint_index > Reward::POOL_CHECKPOINTS.len() - 1 {
+            checkpoint_index = Reward::POOL_CHECKPOINTS.len() - 1;
+        }
+        let remaining_decay_times = decay_times.saturating_sub(checkpoint_index.saturating_mul(10));
+        let mut pool = Reward::POOL_CHECKPOINTS[checkpoint_index];
+        for _ in 0..remaining_decay_times {
             pool = pool
                 .saturating_mul(Reward::DECAY_RATE_NUMERATOR)
                 .saturating_div(Reward::DECAY_RATE_DENOMINATOR);
@@ -50,7 +92,9 @@ impl Reward {
     }
 
     pub fn start_time(period: u32) -> i64 {
-        Reward::PERIOD_DURATION.saturating_mul(period.into()).saturating_add(Reward::GENESIS_TIME)
+        Reward::PERIOD_DURATION
+            .saturating_mul(period.into())
+            .saturating_add(Reward::GENESIS_TIME)
     }
 }
 

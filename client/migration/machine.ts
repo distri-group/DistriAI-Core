@@ -22,7 +22,7 @@ machines.forEach(async (machine) => {
 // migrateMachineRename
 const machineNews = await pg.program.account.machineNew.all();
 machineNews.forEach(async (machineNew) => {
-  const [machineNewPDA] = anchor.web3.PublicKey.findProgramAddressSync(
+  const [machinePDA] = anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from("machine"),
       machineNew.account.owner.toBuffer(),
@@ -34,7 +34,7 @@ machineNews.forEach(async (machineNew) => {
     .migrateMachineRename()
     .accounts({
       machineBefore: machineNew.publicKey,
-      machineAfter: machineNewPDA,
+      machineAfter: machinePDA,
     })
     .rpc();
   await logTransaction(txHash);
