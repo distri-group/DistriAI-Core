@@ -3,30 +3,30 @@ use anchor_lang::prelude::*;
 #[account]
 #[derive(InitSpace)]
 pub struct Order {
-    pub order_id: [u8; 16], // 16
+    pub order_id: [u8; 16],
     /// The buyer of this order.
-    pub buyer: Pubkey, // 32
+    pub buyer: Pubkey,
     /// The seller of this order.
-    pub seller: Pubkey, // 32
+    pub seller: Pubkey,
     /// The machine id of this order.
-    pub machine_id: [u8; 16], // 16
+    pub machine_id: [u8; 16],
     /// The price of this order.
-    pub price: u64, //8
+    pub price: u64,
     /// The duration hours of this order.
-    pub duration: u32, // 4
+    pub duration: u32,
     /// The total amount of this order.
-    pub total: u64, //8
+    pub total: u64,
     /// The metadata by json format of this order.
     #[max_len(2048)]
-    pub metadata: String, // 4 + 2048
+    pub metadata: String,
     /// The status of this order.
-    pub status: OrderStatus, // 1 + 1
+    pub status: OrderStatus,
     /// The order time of this order.
-    pub order_time: i64, // 8
+    pub order_time: i64,
     /// The start time of this order.
-    pub start_time: i64, // 8
+    pub start_time: i64,
     /// The refund time of this order.
-    pub refund_time: i64, // 8
+    pub refund_time: i64,
 }
 
 impl Order {
