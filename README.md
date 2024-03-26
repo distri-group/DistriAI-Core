@@ -3,7 +3,7 @@ This repository contains the core Solana program for the DistriAI.
 
 ## Development
 ### Run in Solana Playground
-- Open https://beta.solpg.io/65e13668cffcf4b13384cf81
+- Open https://beta.solpg.io/66012a18cffcf4b13384cfec
 
 or
 
