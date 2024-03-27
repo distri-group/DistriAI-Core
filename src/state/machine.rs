@@ -3,7 +3,9 @@ use anchor_lang::prelude::*;
 #[account]
 #[derive(InitSpace)]
 pub struct Machine {
+    /// Owner of this machine.
     pub owner: Pubkey,
+    /// UUID of this machine.
     pub uuid: [u8; 16],
     /// The metadata by json format of this machine.
     #[max_len(2048)]
@@ -16,11 +18,11 @@ pub struct Machine {
     pub max_duration: u32,
     /// The GB amount of this machine's avaliable disk.
     pub disk: u32,
-
+    /// The total number of completed orders for this machine.
     pub completed_count: u32,
-
+    /// The total number of failed orders for this machine.
     pub failed_count: u32,
-
+    /// Computing power score of this machine.
     pub score: u8,
     /// Total claimed periodic rewards.
     pub claimed_periodic_rewards: u64,

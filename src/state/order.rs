@@ -3,6 +3,7 @@ use anchor_lang::prelude::*;
 #[account]
 #[derive(InitSpace)]
 pub struct Order {
+    /// UUID of this order.
     pub order_id: [u8; 16],
     /// The buyer of this order.
     pub buyer: Pubkey,
