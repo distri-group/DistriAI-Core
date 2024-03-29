@@ -31,7 +31,7 @@ orderNews.forEach(async (orderNew) => {
     pg.PROGRAM_ID
   );
   const txHash = await pg.program.methods
-    .migrateOrderNew()
+    .migrateOrderRename()
     .accounts({
       orderBefore: orderNew.publicKey,
       orderAfter: orderPDA,

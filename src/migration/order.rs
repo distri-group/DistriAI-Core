@@ -38,7 +38,7 @@ pub fn migrate_order_rename(ctx: Context<MigrationOrderRename>) -> Result<()> {
     order_after.metadata = order_before.metadata.clone();
     order_after.status = order_before.status.clone();
     order_after.order_time = order_before.order_time;
-    order_after.start_time = order_before.order_time;
+    order_after.start_time = order_before.start_time;
     order_after.refund_time = order_before.refund_time;
 
     Ok(())
