@@ -13,7 +13,7 @@ declare_id!("6yFTDdiS1W9T9yg6YejkwKggkEE4NYqdSSzVqQvuLn16");
 
 pub mod dist_token {
     use solana_program::declare_id;
-    declare_id!("896KfVVY6VRGQs1d9CKLnKUEgXXCCJcEEg7LwSK84vWE");
+    declare_id!("2mdavGYoNKKYVx4RvM36pPH6MJ1hr6TjkkcdFzCcpFZR");
 }
 
 #[program]

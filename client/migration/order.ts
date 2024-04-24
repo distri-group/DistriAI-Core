@@ -1,5 +1,14 @@
+import * as web3 from "@solana/web3.js";
+import * as anchor from "@coral-xyz/anchor";
+import type { Errors } from "../target/types/errors";
+
+// Configure the client to use the local cluster
+anchor.setProvider(anchor.AnchorProvider.env());
+
+const program = anchor.workspace.Errors as anchor.Program<Errors>;
+
 // migrateOrderNew
-const orders = await pg.program.account.order.all();
+const orders = await program.account.order.all();
 orders.forEach(async (order) => {
   const [orderNewPDA] = anchor.web3.PublicKey.findProgramAddressSync(
     [
@@ -7,9 +16,9 @@ orders.forEach(async (order) => {
       order.account.buyer.toBuffer(),
       Uint8Array.from(order.account.orderId),
     ],
-    pg.PROGRAM_ID
+    program.programId
   );
-  const txHash = await pg.program.methods
+  const txHash = await program.methods
     .migrateOrderNew()
     .accounts({
       orderBefore: order.publicKey,
@@ -20,7 +29,7 @@ orders.forEach(async (order) => {
 });
 
 // migrateOrderRename
-const orderNews = await pg.program.account.orderNew.all();
+const orderNews = await program.account.orderNew.all();
 orderNews.forEach(async (orderNew) => {
   const [orderPDA] = anchor.web3.PublicKey.findProgramAddressSync(
     [
@@ -28,9 +37,9 @@ orderNews.forEach(async (orderNew) => {
       orderNew.account.buyer.toBuffer(),
       Uint8Array.from(orderNew.account.orderId),
     ],
-    pg.PROGRAM_ID
+    program.programId
   );
-  const txHash = await pg.program.methods
+  const txHash = await program.methods
     .migrateOrderRename()
     .accounts({
       orderBefore: orderNew.publicKey,
@@ -43,9 +52,9 @@ orderNews.forEach(async (orderNew) => {
 // logTransaction
 async function logTransaction(txHash) {
   const { blockhash, lastValidBlockHeight } =
-    await pg.connection.getLatestBlockhash();
+    await program.provider.connection.getLatestBlockhash();
 
-  await pg.connection.confirmTransaction({
+  await program.provider.connection.confirmTransaction({
     blockhash,
     lastValidBlockHeight,
     signature: txHash,

@@ -1,5 +1,14 @@
+import * as web3 from "@solana/web3.js";
+import * as anchor from "@coral-xyz/anchor";
+import type { Errors } from "../target/types/errors";
+
+// Configure the client to use the local cluster
+anchor.setProvider(anchor.AnchorProvider.env());
+
+const program = anchor.workspace.Errors as anchor.Program<Errors>;
+
 // migrateMachineNew
-const machines = await pg.program.account.machine.all();
+const machines = await program.account.machine.all();
 machines.forEach(async (machine) => {
   const [machineNewPDA] = anchor.web3.PublicKey.findProgramAddressSync(
     [
@@ -7,9 +16,9 @@ machines.forEach(async (machine) => {
       machine.account.owner.toBuffer(),
       Uint8Array.from(machine.account.uuid),
     ],
-    pg.PROGRAM_ID
+    program.programId
   );
-  const txHash = await pg.program.methods
+  const txHash = await program.methods
     .migrateMachineNew()
     .accounts({
       machineBefore: machine.publicKey,
@@ -20,7 +29,7 @@ machines.forEach(async (machine) => {
 });
 
 // migrateMachineRename
-const machineNews = await pg.program.account.machineNew.all();
+const machineNews = await program.account.machineNew.all();
 machineNews.forEach(async (machineNew) => {
   const [machinePDA] = anchor.web3.PublicKey.findProgramAddressSync(
     [
@@ -28,9 +37,9 @@ machineNews.forEach(async (machineNew) => {
       machineNew.account.owner.toBuffer(),
       Uint8Array.from(machineNew.account.uuid),
     ],
-    pg.PROGRAM_ID
+    program.programId
   );
-  const txHash = await pg.program.methods
+  const txHash = await program.methods
     .migrateMachineRename()
     .accounts({
       machineBefore: machineNew.publicKey,
@@ -43,9 +52,9 @@ machineNews.forEach(async (machineNew) => {
 // logTransaction
 async function logTransaction(txHash) {
   const { blockhash, lastValidBlockHeight } =
-    await pg.connection.getLatestBlockhash();
+    await program.provider.connection.getLatestBlockhash();
 
-  await pg.connection.confirmTransaction({
+  await program.provider.connection.confirmTransaction({
     blockhash,
     lastValidBlockHeight,
     signature: txHash,
