@@ -343,7 +343,7 @@ pub fn remove_order(ctx: Context<RemoveOrder>) -> Result<()> {
 #[instruction(order_id: [u8; 16])]
 pub struct PlaceOrder<'info> {
     #[account(mut)]
-    pub machine: Account<'info, Machine>,
+    pub machine: Box<Account<'info, Machine>>,
 
     #[account(
         init,
@@ -352,7 +352,7 @@ pub struct PlaceOrder<'info> {
         payer = buyer,
         space = 8 + Order::INIT_SPACE
     )]
-    pub order: Account<'info, Order>,
+    pub order: Box<Account<'info, Order>>,
 
     #[account(mut)]
     pub buyer: Signer<'info>,
@@ -389,13 +389,13 @@ pub struct RenewOrder<'info> {
         mut,
         constraint = machine.uuid == order.machine_id && machine.owner == order.seller
     )]
-    pub machine: Account<'info, Machine>,
+    pub machine: Box<Account<'info, Machine>>,
 
     #[account(
         mut,
         has_one = buyer
     )]
-    pub order: Account<'info, Order>,
+    pub order: Box<Account<'info, Order>>,
 
     #[account(mut)]
     pub buyer: Signer<'info>,
@@ -428,7 +428,7 @@ pub struct StartOrder<'info> {
         mut,
         has_one = seller
     )]
-    pub order: Account<'info, Order>,
+    pub order: Box<Account<'info, Order>>,
 
     #[account(mut)]
     pub seller: Signer<'info>,
@@ -440,13 +440,13 @@ pub struct RefundOrder<'info> {
         mut,
         constraint = machine.uuid == order.machine_id && machine.owner == order.seller
     )]
-    pub machine: Account<'info, Machine>,
+    pub machine: Box<Account<'info, Machine>>,
 
     #[account(
         mut,
         has_one = buyer
     )]
-    pub order: Account<'info, Order>,
+    pub order: Box<Account<'info, Order>>,
 
     #[account(mut)]
     pub buyer: Signer<'info>,
@@ -487,13 +487,13 @@ pub struct OrderCompleted<'info> {
         mut,
         constraint = machine.uuid == order.machine_id && machine.owner == order.seller
     )]
-    pub machine: Account<'info, Machine>,
+    pub machine: Box<Account<'info, Machine>>,
 
     #[account(
         mut,
         has_one = seller
     )]
-    pub order: Account<'info, Order>,
+    pub order: Box<Account<'info, Order>>,
 
     #[account(mut)]
     pub seller: Signer<'info>,
@@ -528,13 +528,13 @@ pub struct OrderFailed<'info> {
         mut,
         constraint = machine.uuid == order.machine_id && machine.owner == order.seller
     )]
-    pub machine: Account<'info, Machine>,
+    pub machine: Box<Account<'info, Machine>>,
 
     #[account(
         mut,
         has_one = seller
     )]
-    pub order: Account<'info, Order>,
+    pub order: Box<Account<'info, Order>>,
 
     #[account(mut)]
     pub seller: Signer<'info>,
@@ -568,7 +568,7 @@ pub struct RemoveOrder<'info> {
         has_one = buyer,
         close = buyer
     )]
-    pub order: Account<'info, Order>,
+    pub order: Box<Account<'info, Order>>,
 
     #[account(mut)]
     pub buyer: Signer<'info>,

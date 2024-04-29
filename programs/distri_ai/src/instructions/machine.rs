@@ -80,7 +80,7 @@ pub struct AddMachine<'info> {
         payer = owner,
         space = 8 + Machine::INIT_SPACE
     )]
-    pub machine: Account<'info, Machine>,
+    pub machine: Box<Account<'info, Machine>>,
 
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -95,7 +95,7 @@ pub struct RemoveMachine<'info> {
         has_one = owner,
         close = owner
     )]
-    pub machine: Account<'info, Machine>,
+    pub machine: Box<Account<'info, Machine>>,
 
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -107,7 +107,7 @@ pub struct MakeOffer<'info> {
         mut,
         has_one = owner
     )]
-    pub machine: Account<'info, Machine>,
+    pub machine: Box<Account<'info, Machine>>,
 
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -119,7 +119,7 @@ pub struct CancelOffer<'info> {
         mut,
         has_one = owner
     )]
-    pub machine: Account<'info, Machine>,
+    pub machine: Box<Account<'info, Machine>>,
 
     #[account(mut)]
     pub owner: Signer<'info>,
