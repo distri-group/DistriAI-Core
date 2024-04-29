@@ -9,11 +9,11 @@ pub mod state;
 
 // This is your program's public key and it will update
 // automatically when you build the project.
-declare_id!("6yFTDdiS1W9T9yg6YejkwKggkEE4NYqdSSzVqQvuLn16");
+declare_id!("8WxFh7ZtvTP1587yvyweoRMt41hCHMsmM48PTbZKM4tY");
 
 pub mod dist_token {
     use solana_program::declare_id;
-    declare_id!("2mdavGYoNKKYVx4RvM36pPH6MJ1hr6TjkkcdFzCcpFZR");
+    declare_id!("896KfVVY6VRGQs1d9CKLnKUEgXXCCJcEEg7LwSK84vWE");
 }
 
 #[program]
@@ -93,6 +93,38 @@ mod distri_ai {
 
     pub fn remove_order(ctx: Context<RemoveOrder>) -> Result<()> {
         instructions::order::remove_order(ctx)
+    }
+
+    pub fn create_ai_model(
+        ctx: Context<CreateAiModel>,
+        name: String,
+        framework: u8,
+        license: u8,
+        type1: u8,
+        type2: u8,
+        tags: String,
+    ) -> Result<()> {
+        instructions::ai_model::create_ai_model(ctx, name, framework, license, type1, type2, tags)
+    }
+
+    pub fn remove_ai_model(ctx: Context<RemoveAiModel>) -> Result<()> {
+        instructions::ai_model::remove_ai_model(ctx)
+    }
+
+    pub fn create_dataset(
+        ctx: Context<CreateDataset>,
+        name: String,
+        framework: u8,
+        scale: u8,
+        type1: u8,
+        type2: u8,
+        tags: String,
+    ) -> Result<()> {
+        instructions::dataset::create_dataset(ctx, name, framework, scale, type1, type2, tags)
+    }
+
+    pub fn remove_dataset(ctx: Context<RemoveDataset>) -> Result<()> {
+        instructions::dataset::remove_dataset(ctx)
     }
 
     // --------------------------------- migration ----------------------------------

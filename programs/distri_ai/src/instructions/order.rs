@@ -142,7 +142,7 @@ pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {
 
         let machine = &mut ctx.accounts.machine;
         machine.status = MachineStatus::ForRent;
-        machine.completed_count = machine.completed_count.saturating_add(1);
+        machine.failed_count = machine.failed_count.saturating_add(1);
 
         // Transfer token from vault to buyer
         let mint_key = ctx.accounts.mint.key();
