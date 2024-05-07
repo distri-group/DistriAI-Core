@@ -137,7 +137,13 @@ pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {
         DistriAIError::IncorrectStatus
     );
 
+    let now_ts = Clock::get()?.unix_timestamp;
     if order.status == OrderStatus::Preparing {
+        let order_cancelable_time = order
+            .order_time
+            .saturating_add(300);
+        require_gte!(now_ts, order_cancelable_time, DistriAIError::IncorrectStatus);
+
         order.status = OrderStatus::Refunded;
 
         let machine = &mut ctx.accounts.machine;
@@ -159,7 +165,6 @@ pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {
         );
         transfer_checked(cpi_context, order.total, ctx.accounts.mint.decimals)?;
     } else {
-        let now_ts = Clock::get()?.unix_timestamp;
         let used_duration: u32 = now_ts
             .saturating_sub(order.start_time)
             .saturating_div(3600)
