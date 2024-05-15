@@ -9,7 +9,7 @@ distri_ai = "6yFTDdiS1W9T9yg6YejkwKggkEE4NYqdSSzVqQvuLn16"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "Devnet"
 wallet = "target/deploy/distri_ai-keypair.json"
 
 [scripts]
