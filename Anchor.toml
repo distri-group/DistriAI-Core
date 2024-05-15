@@ -3,13 +3,13 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-distri_ai = "6yFTDdiS1W9T9yg6YejkwKggkEE4NYqdSSzVqQvuLn16"
+distri_ai = "8WxFh7ZtvTP1587yvyweoRMt41hCHMsmM48PTbZKM4tY"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "https://devnet.helius-rpc.com/?api-key=fb4bcaf8-c252-40bd-87d2-7a9edfa332e7"
 wallet = "target/deploy/distri_ai-keypair.json"
 
 [scripts]
