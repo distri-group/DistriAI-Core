@@ -1,17 +1,29 @@
-# DistriAI-Core-Solana
+# DistriAI-Core
 This repository contains the core Solana program for the DistriAI.
 
 ## Development
-### Run in Solana Playground
-#### Open online
-- Open https://beta.solpg.io/66067c46cffcf4b13384cffc
-#### Open locally
-1. git clone
-2. Open https://beta.solpg.io/
-3. Import from local file system
+### Dependencies
+- rust version 1.77.2
+- solana-cli 1.18.11
+- anchor-cli 0.29.0
 
 ### Deployments
 - devnet: 6yFTDdiS1W9T9yg6YejkwKggkEE4NYqdSSzVqQvuLn16
+
+### Building Locally
+Note: If you are running the build on an Apple computer with an M1 chip, please set the default rust toolchain to `stable-x86_64-apple-darwin`
+```
+rustup default stable-x86_64-apple-darwin
+```
+
+#### Compiling Program
+```
+anchor build
+```
+
+### Building in Solana Playground
+1. Open https://beta.solpg.io/
+1. Import from local file system
 
 ### Test in Solana Playground
 
