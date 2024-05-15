@@ -114,13 +114,13 @@ mod distri_ai {
     pub fn create_dataset(
         ctx: Context<CreateDataset>,
         name: String,
-        framework: u8,
         scale: u8,
+        license: u8,
         type1: u8,
         type2: u8,
         tags: String,
     ) -> Result<()> {
-        instructions::dataset::create_dataset(ctx, name, framework, scale, type1, type2, tags)
+        instructions::dataset::create_dataset(ctx, name, scale, license, type1, type2, tags)
     }
 
     pub fn remove_dataset(ctx: Context<RemoveDataset>) -> Result<()> {
