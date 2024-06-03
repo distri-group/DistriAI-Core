@@ -9,7 +9,7 @@ distri_ai = "6yFTDdiS1W9T9yg6YejkwKggkEE4NYqdSSzVqQvuLn16"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Devnet"
+cluster = "https://devnet.helius-rpc.com/?api-key=94118ab7-ca0d-487b-9e6d-5b6f3c2420ce"
 wallet = "target/deploy/distri_ai-keypair.json"
 
 [scripts]

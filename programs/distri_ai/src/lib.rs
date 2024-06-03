@@ -9,7 +9,7 @@ pub mod state;
 
 // This is your program's public key and it will update
 // automatically when you build the project.
-declare_id!("8WxFh7ZtvTP1587yvyweoRMt41hCHMsmM48PTbZKM4tY");
+declare_id!("6yFTDdiS1W9T9yg6YejkwKggkEE4NYqdSSzVqQvuLn16");
 
 pub mod dist_token {
     use solana_program::declare_id;
