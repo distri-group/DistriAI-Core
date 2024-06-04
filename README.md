@@ -34,4 +34,4 @@ anchor build
 3. Click `Build`
 4. Switch to `Test`
 
-![1713147722077](https://github.com/distri-group/DistriAI-Core/assets/122685398/b80c9548-f9b2-4fec-aff0-5f4db3e0cef9)
+![1713147722077](https://github.com/distri-group/DistriAI-Core/assets/122685398/b80c9548-f9b2-4fec-aff0-5f4db3e0cef9)      
