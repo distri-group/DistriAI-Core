@@ -11,9 +11,18 @@ pub mod state;
 // automatically when you build the project.
 declare_id!("8WxFh7ZtvTP1587yvyweoRMt41hCHMsmM48PTbZKM4tY");
 
-pub mod dist_token {
+mod pubkeys {
     use solana_program::declare_id;
-    declare_id!("896KfVVY6VRGQs1d9CKLnKUEgXXCCJcEEg7LwSK84vWE");
+
+    pub mod admin {
+        use super::*;
+        declare_id!("93j1FmFc9b7gm3xGso4rDCsfKKHaqkABBysmeGMY4xRQ");
+    }
+
+    pub mod dist_token {
+        use super::*;
+        declare_id!("896KfVVY6VRGQs1d9CKLnKUEgXXCCJcEEg7LwSK84vWE");
+    }
 }
 
 #[program]
@@ -93,6 +102,10 @@ mod distri_ai {
 
     pub fn remove_order(ctx: Context<RemoveOrder>) -> Result<()> {
         instructions::order::remove_order(ctx)
+    }
+
+    pub fn admin_remove_order(ctx: Context<AdminRemoveOrder>) -> Result<()> {
+        instructions::order::admin_remove_order(ctx)
     }
 
     pub fn create_ai_model(

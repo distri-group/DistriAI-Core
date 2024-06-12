@@ -3,7 +3,7 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token::{transfer_checked, Mint, Token, TokenAccount, TransferChecked},
 };
-use crate::dist_token;
+use crate::pubkeys::*;
 use crate::errors::DistriAIError;
 use crate::state::ai_model::*;
 use crate::state::machine::*;
@@ -444,6 +444,22 @@ pub fn remove_order(ctx: Context<RemoveOrder>) -> Result<()> {
     Ok(())
 }
 
+pub fn admin_remove_order(ctx: Context<AdminRemoveOrder>) -> Result<()> {
+    let order = &mut ctx.accounts.order;
+    require!(
+        order.status != OrderStatus::Preparing || order.status != OrderStatus::Training,
+        DistriAIError::IncorrectStatus
+    );
+
+    emit!(OrderEvent {
+        order_id: order.order_id,
+        buyer: order.buyer,
+        seller: order.seller,
+        machine_id: order.machine_id,
+    });
+    Ok(())
+}
+
 #[derive(Accounts)]
 #[instruction(order_id: [u8; 16])]
 pub struct PlaceOrder<'info> {
@@ -762,6 +778,21 @@ pub struct RemoveOrder<'info> {
 
     #[account(mut)]
     pub buyer: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct AdminRemoveOrder<'info> {
+    #[account(
+        mut,
+        close = admin
+    )]
+    pub order: Box<Account<'info, Order>>,
+
+    #[account(
+        mut,
+        address = admin::ID
+    )]
+    pub admin: Signer<'info>,
 }
 
 #[event]

@@ -3,7 +3,7 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token::{transfer_checked, Mint, Token, TokenAccount, TransferChecked},
 };
-use crate::dist_token;
+use crate::pubkeys::dist_token;
 use crate::errors::DistriAIError;
 use crate::state::machine::*;
 use crate::state::reward::*;
