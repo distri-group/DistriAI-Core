@@ -1,24 +1,15 @@
-import * as web3 from "@solana/web3.js";
-import * as anchor from "@coral-xyz/anchor";
-import type { Errors } from "../target/types/errors";
-
-// Configure the client to use the local cluster
-anchor.setProvider(anchor.AnchorProvider.env());
-
-const program = anchor.workspace.Errors as anchor.Program<Errors>;
-
 // migrateOrderNew
-const orders = await program.account.order.all();
-orders.forEach(async (order) => {
+const orders = await pg.program.account.order.all();
+for (let order of orders) {
   const [orderNewPDA] = anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from("order-new"),
       order.account.buyer.toBuffer(),
       Uint8Array.from(order.account.orderId),
     ],
-    program.programId
+    pg.PROGRAM_ID
   );
-  const txHash = await program.methods
+  const txHash = await pg.program.methods
     .migrateOrderNew()
     .accounts({
       orderBefore: order.publicKey,
@@ -26,20 +17,20 @@ orders.forEach(async (order) => {
     })
     .rpc();
   await logTransaction(txHash);
-});
+}
 
 // migrateOrderRename
-const orderNews = await program.account.orderNew.all();
-orderNews.forEach(async (orderNew) => {
+const orderNews = await pg.program.account.orderNew.all();
+for (let orderNew of orderNews) {
   const [orderPDA] = anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from("order"),
       orderNew.account.buyer.toBuffer(),
       Uint8Array.from(orderNew.account.orderId),
     ],
-    program.programId
+    pg.PROGRAM_ID
   );
-  const txHash = await program.methods
+  const txHash = await pg.program.methods
     .migrateOrderRename()
     .accounts({
       orderBefore: orderNew.publicKey,
@@ -47,14 +38,14 @@ orderNews.forEach(async (orderNew) => {
     })
     .rpc();
   await logTransaction(txHash);
-});
+};
 
 // logTransaction
 async function logTransaction(txHash) {
   const { blockhash, lastValidBlockHeight } =
-    await program.provider.connection.getLatestBlockhash();
+    await pg.connection.getLatestBlockhash();
 
-  await program.provider.connection.confirmTransaction({
+  await pg.connection.confirmTransaction({
     blockhash,
     lastValidBlockHeight,
     signature: txHash,
