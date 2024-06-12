@@ -498,7 +498,7 @@ pub struct PlaceOrder<'info> {
         associated_token::mint = mint,
         associated_token::authority = buyer
     )]
-    pub buyer_ata: Account<'info, TokenAccount>,
+    pub buyer_ata: Box<Account<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
@@ -508,7 +508,7 @@ pub struct PlaceOrder<'info> {
         token::mint = mint,
         token::authority = vault
     )]
-    pub vault: Account<'info, TokenAccount>,
+    pub vault: Box<Account<'info, TokenAccount>>,
 
     #[account(
         address = dist_token::ID
@@ -541,14 +541,14 @@ pub struct RenewOrder<'info> {
         associated_token::mint = mint,
         associated_token::authority = buyer
     )]
-    pub buyer_ata: Account<'info, TokenAccount>,
+    pub buyer_ata: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
         seeds = [b"vault", mint.key().as_ref()],
         bump
     )]
-    pub vault: Account<'info, TokenAccount>,
+    pub vault: Box<Account<'info, TokenAccount>>,
 
     #[account(
         address = dist_token::ID
@@ -592,56 +592,56 @@ pub struct RefundOrder<'info> {
         associated_token::mint = mint,
         associated_token::authority = buyer
     )]
-    pub buyer_ata: Account<'info, TokenAccount>,
+    pub buyer_ata: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = order.seller
     )]
-    pub seller_ata: Account<'info, TokenAccount>,
+    pub seller_ata: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = order.model1_owner
     )]
-    pub model1_owner_ata: Option<Account<'info, TokenAccount>>,
+    pub model1_owner_ata: Option<Box<Account<'info, TokenAccount>>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = order.model2_owner
     )]
-    pub model2_owner_ata: Option<Account<'info, TokenAccount>>,
+    pub model2_owner_ata: Option<Box<Account<'info, TokenAccount>>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = order.model3_owner
     )]
-    pub model3_owner_ata: Option<Account<'info, TokenAccount>>,
+    pub model3_owner_ata: Option<Box<Account<'info, TokenAccount>>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = order.model4_owner
     )]
-    pub model4_owner_ata: Option<Account<'info, TokenAccount>>,
+    pub model4_owner_ata: Option<Box<Account<'info, TokenAccount>>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = order.model5_owner
     )]
-    pub model5_owner_ata: Option<Account<'info, TokenAccount>>,
+    pub model5_owner_ata: Option<Box<Account<'info, TokenAccount>>>,
 
     #[account(
         mut,
         seeds = [b"vault", mint.key().as_ref()],
         bump
     )]
-    pub vault: Account<'info, TokenAccount>,
+    pub vault: Box<Account<'info, TokenAccount>>,
 
     #[account(
         address = dist_token::ID
@@ -675,49 +675,49 @@ pub struct OrderCompleted<'info> {
         associated_token::mint = mint,
         associated_token::authority = seller
     )]
-    pub seller_ata: Account<'info, TokenAccount>,
+    pub seller_ata: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = order.model1_owner
     )]
-    pub model1_owner_ata: Option<Account<'info, TokenAccount>>,
+    pub model1_owner_ata: Option<Box<Account<'info, TokenAccount>>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = order.model2_owner
     )]
-    pub model2_owner_ata: Option<Account<'info, TokenAccount>>,
+    pub model2_owner_ata: Option<Box<Account<'info, TokenAccount>>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = order.model3_owner
     )]
-    pub model3_owner_ata: Option<Account<'info, TokenAccount>>,
+    pub model3_owner_ata: Option<Box<Account<'info, TokenAccount>>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = order.model4_owner
     )]
-    pub model4_owner_ata: Option<Account<'info, TokenAccount>>,
+    pub model4_owner_ata: Option<Box<Account<'info, TokenAccount>>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = order.model5_owner
     )]
-    pub model5_owner_ata: Option<Account<'info, TokenAccount>>,
+    pub model5_owner_ata: Option<Box<Account<'info, TokenAccount>>>,
 
     #[account(
         mut,
         seeds = [b"vault", mint.key().as_ref()],
         bump
     )]
-    pub vault: Account<'info, TokenAccount>,
+    pub vault: Box<Account<'info, TokenAccount>>,
 
     #[account(
         address = dist_token::ID
@@ -750,14 +750,14 @@ pub struct OrderFailed<'info> {
         associated_token::mint = mint,
         associated_token::authority = order.buyer
     )]
-    pub buyer_ata: Account<'info, TokenAccount>,
+    pub buyer_ata: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
         seeds = [b"vault", mint.key().as_ref()],
         bump
     )]
-    pub vault: Account<'info, TokenAccount>,
+    pub vault: Box<Account<'info, TokenAccount>>,
 
     #[account(
         address = dist_token::ID
