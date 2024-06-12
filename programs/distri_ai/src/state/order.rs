@@ -28,6 +28,21 @@ pub struct Order {
     pub start_time: i64,
     /// The refund time of this order.
     pub refund_time: i64,
+    pub model1_owner: Pubkey,
+    #[max_len(50)]
+    pub model1_name: String,
+    pub model2_owner: Pubkey,
+    #[max_len(50)]
+    pub model2_name: String,
+    pub model3_owner: Pubkey,
+    #[max_len(50)]
+    pub model3_name: String,
+    pub model4_owner: Pubkey,
+    #[max_len(50)]
+    pub model4_name: String,
+    pub model5_owner: Pubkey,
+    #[max_len(50)]
+    pub model5_name: String,
 }
 
 impl Order {
@@ -61,6 +76,21 @@ pub struct OrderNew {
     pub start_time: i64, // 8
     /// The refund time of this order.
     pub refund_time: i64, // 8
+    pub model1_owner: Pubkey,
+    #[max_len(50)]
+    pub model1_name: String,
+    pub model2_owner: Pubkey,
+    #[max_len(50)]
+    pub model2_name: String,
+    pub model3_owner: Pubkey,
+    #[max_len(50)]
+    pub model3_name: String,
+    pub model4_owner: Pubkey,
+    #[max_len(50)]
+    pub model4_name: String,
+    pub model5_owner: Pubkey,
+    #[max_len(50)]
+    pub model5_name: String,
 }
 
 /// OrderStatus holds the current state of the order.

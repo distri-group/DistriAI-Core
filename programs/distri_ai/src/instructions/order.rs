@@ -5,6 +5,7 @@ use anchor_spl::{
 };
 use crate::dist_token;
 use crate::errors::DistriAIError;
+use crate::state::ai_model::*;
 use crate::state::machine::*;
 use crate::state::order::*;
 
@@ -56,6 +57,26 @@ pub fn place_order(
     order.status = OrderStatus::Preparing;
     order.order_time = Clock::get()?.unix_timestamp;
     order.refund_time = 0;
+    if let Some(model) = &ctx.accounts.model1 {
+        order.model1_owner = model.owner;
+        order.model1_name = model.name.clone();
+    }
+    if let Some(model) = &ctx.accounts.model2 {
+        order.model2_owner = model.owner;
+        order.model2_name = model.name.clone();
+    }
+    if let Some(model) = &ctx.accounts.model3 {
+        order.model3_owner = model.owner;
+        order.model3_name = model.name.clone();
+    }
+    if let Some(model) = &ctx.accounts.model4 {
+        order.model4_owner = model.owner;
+        order.model4_name = model.name.clone();
+    }
+    if let Some(model) = &ctx.accounts.model5 {
+        order.model5_owner = model.owner;
+        order.model5_name = model.name.clone();
+    }
 
     machine.status = MachineStatus::Renting;
     machine.order_pda = order.key();
@@ -185,7 +206,24 @@ pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {
         machine.status = MachineStatus::ForRent;
         machine.completed_count = machine.completed_count.saturating_add(1);
 
-        // Transfer token from vault to seller
+        // Transfer token from vault to seller & model owner
+        let mut model_owners = vec![];
+        if let Some(ata) = &ctx.accounts.model1_owner_ata {
+            model_owners.push(ata.to_account_info());
+        }
+        if let Some(ata) = &ctx.accounts.model2_owner_ata {
+            model_owners.push(ata.to_account_info());
+        }
+        if let Some(ata) = &ctx.accounts.model3_owner_ata {
+            model_owners.push(ata.to_account_info());
+        }
+        if let Some(ata) = &ctx.accounts.model4_owner_ata {
+            model_owners.push(ata.to_account_info());
+        }
+        if let Some(ata) = &ctx.accounts.model5_owner_ata {
+            model_owners.push(ata.to_account_info());
+        }
+
         let used_total = order.price.saturating_mul(used_duration.into());
         let mint_key = ctx.accounts.mint.key();
         let signer: &[&[&[u8]]] = &[&[b"vault", mint_key.as_ref(), &[ctx.bumps.vault]]];
@@ -199,7 +237,29 @@ pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {
             },
             signer,
         );
-        transfer_checked(cpi_context_seller, used_total, ctx.accounts.mint.decimals)?;
+        if model_owners.len() == 0 {
+            transfer_checked(cpi_context_seller, used_total, ctx.accounts.mint.decimals)?;
+        } else {
+            let to_seller = used_total.saturating_mul(95).saturating_div(100);
+            transfer_checked(cpi_context_seller, to_seller, ctx.accounts.mint.decimals)?;
+    
+            let to_model_owner = used_total
+                .saturating_sub(to_seller)
+                .saturating_div(model_owners.len().try_into().unwrap());
+            for model_owner in model_owners {
+                let cpi_context = CpiContext::new_with_signer(
+                    ctx.accounts.token_program.to_account_info(),
+                    TransferChecked {
+                        from: ctx.accounts.vault.to_account_info(),
+                        mint: ctx.accounts.mint.to_account_info(),
+                        to: model_owner,
+                        authority: ctx.accounts.vault.to_account_info(),
+                    },
+                    signer,
+                );
+                transfer_checked(cpi_context, to_model_owner, ctx.accounts.mint.decimals)?;
+            }
+        }
 
         // Transfer token from vault to buyer
         let cpi_context_buyer = CpiContext::new_with_signer(
@@ -257,7 +317,24 @@ pub fn order_completed(ctx: Context<OrderCompleted>, metadata: String, score: u8
     machine.completed_count = machine.completed_count.saturating_add(1);
     machine.score = score;
 
-    // Transfer token from vault to seller
+    // Transfer token from vault to seller & model owner
+    let mut model_owners = vec![];
+    if let Some(ata) = &ctx.accounts.model1_owner_ata {
+        model_owners.push(ata.to_account_info());
+    }
+    if let Some(ata) = &ctx.accounts.model2_owner_ata {
+        model_owners.push(ata.to_account_info());
+    }
+    if let Some(ata) = &ctx.accounts.model3_owner_ata {
+        model_owners.push(ata.to_account_info());
+    }
+    if let Some(ata) = &ctx.accounts.model4_owner_ata {
+        model_owners.push(ata.to_account_info());
+    }
+    if let Some(ata) = &ctx.accounts.model5_owner_ata {
+        model_owners.push(ata.to_account_info());
+    }
+
     let mint_key = ctx.accounts.mint.key();
     let signer: &[&[&[u8]]] = &[&[b"vault", mint_key.as_ref(), &[ctx.bumps.vault]]];
     let cpi_context = CpiContext::new_with_signer(
@@ -270,7 +347,30 @@ pub fn order_completed(ctx: Context<OrderCompleted>, metadata: String, score: u8
         },
         signer,
     );
-    transfer_checked(cpi_context, order.total, ctx.accounts.mint.decimals)?;
+    if model_owners.len() == 0 {
+        transfer_checked(cpi_context, order.total, ctx.accounts.mint.decimals)?;
+    } else {
+        let to_seller = order.total.saturating_mul(95).saturating_div(100);
+        transfer_checked(cpi_context, to_seller, ctx.accounts.mint.decimals)?;
+
+        let to_model_owner = order.total
+            .saturating_sub(to_seller)
+            .saturating_div(model_owners.len().try_into().unwrap());
+        for model_owner in model_owners {
+            let cpi_context = CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                TransferChecked {
+                    from: ctx.accounts.vault.to_account_info(),
+                    mint: ctx.accounts.mint.to_account_info(),
+                    to: model_owner,
+                    authority: ctx.accounts.vault.to_account_info(),
+                },
+                signer,
+            );
+            transfer_checked(cpi_context, to_model_owner, ctx.accounts.mint.decimals)?;
+        }
+    }
+    
 
     emit!(OrderEvent {
         order_id: order.order_id,
@@ -358,6 +458,21 @@ pub struct PlaceOrder<'info> {
         space = 8 + Order::INIT_SPACE
     )]
     pub order: Box<Account<'info, Order>>,
+
+    #[account()]
+    pub model1: Option<Box<Account<'info, AiModel>>>,
+
+    #[account()]
+    pub model2: Option<Box<Account<'info, AiModel>>>,
+
+    #[account()]
+    pub model3: Option<Box<Account<'info, AiModel>>>,
+
+    #[account()]
+    pub model4: Option<Box<Account<'info, AiModel>>>,
+
+    #[account()]
+    pub model5: Option<Box<Account<'info, AiModel>>>,
 
     #[account(mut)]
     pub buyer: Signer<'info>,
@@ -472,6 +587,41 @@ pub struct RefundOrder<'info> {
 
     #[account(
         mut,
+        associated_token::mint = mint,
+        associated_token::authority = order.model1_owner
+    )]
+    pub model1_owner_ata: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = order.model2_owner
+    )]
+    pub model2_owner_ata: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = order.model3_owner
+    )]
+    pub model3_owner_ata: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = order.model4_owner
+    )]
+    pub model4_owner_ata: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = order.model5_owner
+    )]
+    pub model5_owner_ata: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
         seeds = [b"vault", mint.key().as_ref()],
         bump
     )]
@@ -510,6 +660,41 @@ pub struct OrderCompleted<'info> {
         associated_token::authority = seller
     )]
     pub seller_ata: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = order.model1_owner
+    )]
+    pub model1_owner_ata: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = order.model2_owner
+    )]
+    pub model2_owner_ata: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = order.model3_owner
+    )]
+    pub model3_owner_ata: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = order.model4_owner
+    )]
+    pub model4_owner_ata: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = order.model5_owner
+    )]
+    pub model5_owner_ata: Option<Account<'info, TokenAccount>>,
 
     #[account(
         mut,

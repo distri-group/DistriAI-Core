@@ -12,14 +12,9 @@ pub fn migrate_order_new(ctx: Context<MigrationOrderNew>) -> Result<()> {
     order_after.duration = order_before.duration;
     order_after.total = order_before.total;
     order_after.metadata = order_before.metadata.clone();
-    order_after.status = match order_before.status {
-        OrderStatus::Preparing => OrderStatus::Training,
-        OrderStatus::Training => OrderStatus::Completed,
-        OrderStatus::Completed => OrderStatus::Failed,
-        _ => OrderStatus::Refunded,
-    };
+    order_after.status = order_before.status.clone();
     order_after.order_time = order_before.order_time;
-    order_after.start_time = order_before.order_time;
+    order_after.start_time = order_before.start_time;
     order_after.refund_time = order_before.refund_time;
 
     Ok(())
@@ -50,7 +45,7 @@ pub struct MigrationOrderNew<'info> {
         mut,
         close = signer
     )]
-    pub order_before: Account<'info, Order>,
+    pub order_before: Box<Account<'info, Order>>,
 
     #[account(
         init,
@@ -59,7 +54,7 @@ pub struct MigrationOrderNew<'info> {
         payer = signer,
         space = 8 + OrderNew::INIT_SPACE
     )]
-    pub order_after: Account<'info, OrderNew>,
+    pub order_after: Box<Account<'info, OrderNew>>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -73,7 +68,7 @@ pub struct MigrationOrderRename<'info> {
         mut,
         close = signer
     )]
-    pub order_before: Account<'info, OrderNew>,
+    pub order_before: Box<Account<'info, OrderNew>>,
 
     #[account(
         init,
@@ -82,7 +77,7 @@ pub struct MigrationOrderRename<'info> {
         payer = signer,
         space = 8 + Order::INIT_SPACE
     )]
-    pub order_after: Account<'info, Order>,
+    pub order_after: Box<Account<'info, Order>>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
