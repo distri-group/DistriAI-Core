@@ -35,6 +35,16 @@ pub fn migrate_order_rename(ctx: Context<MigrationOrderRename>) -> Result<()> {
     order_after.order_time = order_before.order_time;
     order_after.start_time = order_before.start_time;
     order_after.refund_time = order_before.refund_time;
+    order_after.model1_owner = order_before.model1_owner;
+    order_after.model1_name = order_before.model1_name.clone();
+    order_after.model2_owner = order_before.model2_owner;
+    order_after.model2_name = order_before.model2_name.clone();
+    order_after.model3_owner = order_before.model3_owner;
+    order_after.model3_name = order_before.model3_name.clone();
+    order_after.model4_owner = order_before.model4_owner;
+    order_after.model4_name = order_before.model4_name.clone();
+    order_after.model5_owner = order_before.model5_owner;
+    order_after.model5_name = order_before.model5_name.clone();
 
     Ok(())
 }

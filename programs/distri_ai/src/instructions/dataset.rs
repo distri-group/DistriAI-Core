@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::errors::DistriAIError;
 use crate::state::dataset::*;
+use crate::state::statistics::*;
 
 pub fn create_dataset(
     ctx: Context<CreateDataset>,
@@ -69,6 +70,15 @@ pub struct CreateDataset<'info> {
 
     #[account(mut)]
     pub owner: Signer<'info>,
+
+    #[account(
+        init_if_needed,
+        seeds = [b"statistics", owner.key().as_ref()],
+        bump,
+        payer = owner,
+        space = 8 + Statistics::INIT_SPACE
+    )]
+    pub statistics_owner: Account<'info, Statistics>,
 
     pub system_program: Program<'info, System>,
 }

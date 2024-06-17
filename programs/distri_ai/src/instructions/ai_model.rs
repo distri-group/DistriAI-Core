@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::errors::DistriAIError;
 use crate::state::ai_model::*;
+use crate::state::statistics::*;
 
 pub fn create_ai_model(
     ctx: Context<CreateAiModel>,
@@ -69,6 +70,15 @@ pub struct CreateAiModel<'info> {
 
     #[account(mut)]
     pub owner: Signer<'info>,
+
+    #[account(
+        init_if_needed,
+        seeds = [b"statistics", owner.key().as_ref()],
+        bump,
+        payer = owner,
+        space = 8 + Statistics::INIT_SPACE
+    )]
+    pub statistics_owner: Account<'info, Statistics>,
 
     pub system_program: Program<'info, System>,
 }

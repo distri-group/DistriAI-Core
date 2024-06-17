@@ -7,6 +7,7 @@ use crate::pubkeys::dist_token;
 use crate::errors::DistriAIError;
 use crate::state::machine::*;
 use crate::state::reward::*;
+use crate::state::statistics::*;
 
 pub fn reward_pool_deposit(ctx: Context<RewardPoolDeposit>, amount: u64) -> Result<()> {
     let cpi_context = CpiContext::new(
@@ -36,6 +37,9 @@ pub fn claim(ctx: Context<Claim>, period: u32) -> Result<()> {
 
     let machine = &mut ctx.accounts.machine;
     machine.claimed_periodic_rewards = machine.claimed_periodic_rewards.saturating_add(reward.unit_periodic_reward);
+
+    let statistics_owner = &mut ctx.accounts.statistics_owner;
+    statistics_owner.machine_reward_claimed = statistics_owner.machine_reward_claimed.saturating_add(reward.unit_periodic_reward);
 
     // Transfer token from reward pool to owner
     let mint_key = ctx.accounts.mint.key();
@@ -123,6 +127,13 @@ pub struct Claim<'info> {
         associated_token::authority = owner
     )]
     pub owner_ata: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        seeds = [b"statistics", owner.key().as_ref()],
+        bump,
+    )]
+    pub statistics_owner: Account<'info, Statistics>,
 
     #[account(
         mut,

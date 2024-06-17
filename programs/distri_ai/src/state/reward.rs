@@ -88,7 +88,7 @@ impl Reward {
                 .saturating_mul(Reward::DECAY_RATE_NUMERATOR)
                 .saturating_div(Reward::DECAY_RATE_DENOMINATOR);
         }
-        pool
+        pool.saturating_mul(8).saturating_div(10)
     }
 
     pub fn start_time(period: u32) -> i64 {

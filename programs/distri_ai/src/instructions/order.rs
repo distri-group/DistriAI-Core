@@ -8,6 +8,7 @@ use crate::errors::DistriAIError;
 use crate::state::ai_model::*;
 use crate::state::machine::*;
 use crate::state::order::*;
+use crate::state::statistics::*;
 
 pub fn place_order(
     ctx: Context<PlaceOrder>,
@@ -237,15 +238,35 @@ pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {
             },
             signer,
         );
+
+        let statistics_seller = &mut ctx.accounts.statistics_seller;
         if model_owners.len() == 0 {
+            statistics_seller.machine_earning = statistics_seller.machine_earning.saturating_add(used_total);
             transfer_checked(cpi_context_seller, used_total, ctx.accounts.mint.decimals)?;
         } else {
             let to_seller = used_total.saturating_mul(95).saturating_div(100);
+            statistics_seller.machine_earning = statistics_seller.machine_earning.saturating_add(to_seller);
             transfer_checked(cpi_context_seller, to_seller, ctx.accounts.mint.decimals)?;
     
             let to_model_owner = used_total
                 .saturating_sub(to_seller)
                 .saturating_div(model_owners.len().try_into().unwrap());
+            if let Some(statistics) = &mut ctx.accounts.statistics_model1_owner {
+                statistics.ai_model_dataset_earning = statistics.ai_model_dataset_earning.saturating_add(to_model_owner);
+            }
+            if let Some(statistics) = &mut ctx.accounts.statistics_model2_owner {
+                statistics.ai_model_dataset_earning = statistics.ai_model_dataset_earning.saturating_add(to_model_owner);
+            }
+            if let Some(statistics) = &mut ctx.accounts.statistics_model3_owner {
+                statistics.ai_model_dataset_earning = statistics.ai_model_dataset_earning.saturating_add(to_model_owner);
+            }
+            if let Some(statistics) = &mut ctx.accounts.statistics_model4_owner {
+                statistics.ai_model_dataset_earning = statistics.ai_model_dataset_earning.saturating_add(to_model_owner);
+            }
+            if let Some(statistics) = &mut ctx.accounts.statistics_model5_owner {
+                statistics.ai_model_dataset_earning = statistics.ai_model_dataset_earning.saturating_add(to_model_owner);
+            }
+
             for model_owner in model_owners {
                 let cpi_context = CpiContext::new_with_signer(
                     ctx.accounts.token_program.to_account_info(),
@@ -347,15 +368,35 @@ pub fn order_completed(ctx: Context<OrderCompleted>, metadata: String, score: u8
         },
         signer,
     );
+
+    let statistics_seller = &mut ctx.accounts.statistics_seller;
     if model_owners.len() == 0 {
+        statistics_seller.machine_earning = statistics_seller.machine_earning.saturating_add(order.total);
         transfer_checked(cpi_context, order.total, ctx.accounts.mint.decimals)?;
     } else {
         let to_seller = order.total.saturating_mul(95).saturating_div(100);
+        statistics_seller.machine_earning = statistics_seller.machine_earning.saturating_add(to_seller);
         transfer_checked(cpi_context, to_seller, ctx.accounts.mint.decimals)?;
 
         let to_model_owner = order.total
             .saturating_sub(to_seller)
             .saturating_div(model_owners.len().try_into().unwrap());
+        if let Some(statistics) = &mut ctx.accounts.statistics_model1_owner {
+            statistics.ai_model_dataset_earning = statistics.ai_model_dataset_earning.saturating_add(to_model_owner);
+        }
+        if let Some(statistics) = &mut ctx.accounts.statistics_model2_owner {
+            statistics.ai_model_dataset_earning = statistics.ai_model_dataset_earning.saturating_add(to_model_owner);
+        }
+        if let Some(statistics) = &mut ctx.accounts.statistics_model3_owner {
+            statistics.ai_model_dataset_earning = statistics.ai_model_dataset_earning.saturating_add(to_model_owner);
+        }
+        if let Some(statistics) = &mut ctx.accounts.statistics_model4_owner {
+            statistics.ai_model_dataset_earning = statistics.ai_model_dataset_earning.saturating_add(to_model_owner);
+        }
+        if let Some(statistics) = &mut ctx.accounts.statistics_model5_owner {
+            statistics.ai_model_dataset_earning = statistics.ai_model_dataset_earning.saturating_add(to_model_owner);
+        }
+
         for model_owner in model_owners {
             let cpi_context = CpiContext::new_with_signer(
                 ctx.accounts.token_program.to_account_info(),
@@ -638,6 +679,48 @@ pub struct RefundOrder<'info> {
 
     #[account(
         mut,
+        seeds = [b"statistics", order.seller.key().as_ref()],
+        bump
+    )]
+    pub statistics_seller: Box<Account<'info, Statistics>>,
+
+    #[account(
+        mut,
+        seeds = [b"statistics", order.model1_owner.key().as_ref()],
+        bump
+    )]
+    pub statistics_model1_owner: Option<Box<Account<'info, Statistics>>>,
+
+    #[account(
+        mut,
+        seeds = [b"statistics", order.model2_owner.key().as_ref()],
+        bump
+    )]
+    pub statistics_model2_owner: Option<Box<Account<'info, Statistics>>>,
+
+    #[account(
+        mut,
+        seeds = [b"statistics", order.model3_owner.key().as_ref()],
+        bump
+    )]
+    pub statistics_model3_owner: Option<Box<Account<'info, Statistics>>>,
+
+    #[account(
+        mut,
+        seeds = [b"statistics", order.model4_owner.key().as_ref()],
+        bump
+    )]
+    pub statistics_model4_owner: Option<Box<Account<'info, Statistics>>>,
+
+    #[account(
+        mut,
+        seeds = [b"statistics", order.model5_owner.key().as_ref()],
+        bump
+    )]
+    pub statistics_model5_owner: Option<Box<Account<'info, Statistics>>>,
+
+    #[account(
+        mut,
         seeds = [b"vault", mint.key().as_ref()],
         bump
     )]
@@ -711,6 +794,48 @@ pub struct OrderCompleted<'info> {
         associated_token::authority = order.model5_owner
     )]
     pub model5_owner_ata: Option<Box<Account<'info, TokenAccount>>>,
+
+    #[account(
+        mut,
+        seeds = [b"statistics", order.seller.key().as_ref()],
+        bump
+    )]
+    pub statistics_seller: Box<Account<'info, Statistics>>,
+
+    #[account(
+        mut,
+        seeds = [b"statistics", order.model1_owner.key().as_ref()],
+        bump
+    )]
+    pub statistics_model1_owner: Option<Box<Account<'info, Statistics>>>,
+
+    #[account(
+        mut,
+        seeds = [b"statistics", order.model2_owner.key().as_ref()],
+        bump
+    )]
+    pub statistics_model2_owner: Option<Box<Account<'info, Statistics>>>,
+
+    #[account(
+        mut,
+        seeds = [b"statistics", order.model3_owner.key().as_ref()],
+        bump
+    )]
+    pub statistics_model3_owner: Option<Box<Account<'info, Statistics>>>,
+
+    #[account(
+        mut,
+        seeds = [b"statistics", order.model4_owner.key().as_ref()],
+        bump
+    )]
+    pub statistics_model4_owner: Option<Box<Account<'info, Statistics>>>,
+
+    #[account(
+        mut,
+        seeds = [b"statistics", order.model5_owner.key().as_ref()],
+        bump
+    )]
+    pub statistics_model5_owner: Option<Box<Account<'info, Statistics>>>,
 
     #[account(
         mut,

@@ -140,6 +140,14 @@ mod distri_ai {
         instructions::dataset::remove_dataset(ctx)
     }
 
+    pub fn report_ai_model_dataset_reward(ctx: Context<ReportAiModelDatasetReward>, amount: u64) -> Result<()> {
+        instructions::statistics::report_ai_model_dataset_reward(ctx, amount)
+    }
+
+    pub fn claim_ai_model_dataset_reward(ctx: Context<ClaimAiModelDatasetReward>) -> Result<()> {
+        instructions::statistics::claim_ai_model_dataset_reward(ctx)
+    }
+
     // --------------------------------- migration ----------------------------------
     pub fn migrate_machine_new(ctx: Context<MigrationMachineNew>) -> Result<()> {
         migration::machine::migrate_machine_new(ctx)
