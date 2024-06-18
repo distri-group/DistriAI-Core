@@ -35,6 +35,9 @@ pub fn create_ai_model(
     ai_model.create_time = now_ts;
     ai_model.update_time = now_ts;
 
+    let statistics_owner = &mut ctx.accounts.statistics_owner;
+    statistics_owner.owner = ai_model.owner;
+
     emit!(AiModelEvent {
         owner: ai_model.owner,
         name: ai_model.name.clone(),

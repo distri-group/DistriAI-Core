@@ -16,6 +16,9 @@ pub fn add_machine(ctx: Context<AddMachine>, uuid: [u8; 16], metadata: String) -
     machine.metadata = metadata;
     machine.status = MachineStatus::Idle;
 
+    let statistics_owner = &mut ctx.accounts.statistics_owner;
+    statistics_owner.owner = machine.owner;
+
     emit!(MachineEvent {
         owner: machine.owner,
         uuid: machine.uuid,

@@ -35,6 +35,9 @@ pub fn create_dataset(
     dataset.create_time = now_ts;
     dataset.update_time = now_ts;
 
+    let statistics_owner = &mut ctx.accounts.statistics_owner;
+    statistics_owner.owner = dataset.owner;
+
     emit!(DatasetEvent {
         owner: dataset.owner,
         name: dataset.name.clone(),

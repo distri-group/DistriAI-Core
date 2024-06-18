@@ -130,8 +130,7 @@ pub struct Claim<'info> {
 
     #[account(
         mut,
-        seeds = [b"statistics", owner.key().as_ref()],
-        bump,
+        has_one = owner
     )]
     pub statistics_owner: Account<'info, Statistics>,
 

@@ -18,6 +18,7 @@ pub fn report_ai_model_dataset_reward(ctx: Context<ReportAiModelDatasetReward>, 
 
 pub fn claim_ai_model_dataset_reward(ctx: Context<ClaimAiModelDatasetReward>) -> Result<()> {
     let statistics_owner = &mut ctx.accounts.statistics_owner;
+    require_gt!(statistics_owner.ai_model_dataset_reward_claimable, 0, ErrorCode::RequireGtViolated);
 
     // Transfer token from reward pool to owner
     let mint_key = ctx.accounts.mint.key();
@@ -46,14 +47,7 @@ pub fn claim_ai_model_dataset_reward(ctx: Context<ClaimAiModelDatasetReward>) ->
 
 #[derive(Accounts)]
 pub struct ReportAiModelDatasetReward<'info> {
-    #[account()]
-    pub owner: AccountInfo<'info>,
-
-    #[account(
-        mut,
-        seeds = [b"statistics", owner.key().as_ref()],
-        bump
-    )]
+    #[account(mut)]
     pub statistics_owner: Account<'info, Statistics>,
 
     #[account(
@@ -78,8 +72,7 @@ pub struct ClaimAiModelDatasetReward<'info> {
 
     #[account(
         mut,
-        seeds = [b"statistics", owner.key().as_ref()],
-        bump,
+        has_one = owner
     )]
     pub statistics_owner: Account<'info, Statistics>,
 
