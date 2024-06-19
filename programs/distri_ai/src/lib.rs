@@ -147,6 +147,13 @@ mod distri_ai {
     pub fn claim_ai_model_dataset_reward(ctx: Context<ClaimAiModelDatasetReward>) -> Result<()> {
         instructions::statistics::claim_ai_model_dataset_reward(ctx)
     }
+    pub fn admin_init_statistics(ctx: Context<AdminInitStatistics>, owner: Pubkey) -> Result<()> {
+        instructions::statistics::admin_init_statistics(ctx, owner)
+    }
+    
+    pub fn admin_close_statistics(ctx: Context<AdminCloseStatistics>) -> Result<()> {
+        instructions::statistics::admin_close_statistics(ctx)
+    }
 
     // --------------------------------- migration ----------------------------------
     pub fn migrate_machine_new(ctx: Context<MigrationMachineNew>) -> Result<()> {

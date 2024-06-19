@@ -45,6 +45,16 @@ pub fn claim_ai_model_dataset_reward(ctx: Context<ClaimAiModelDatasetReward>) ->
     Ok(())
 }
 
+pub fn admin_init_statistics(ctx: Context<AdminInitStatistics>, owner: Pubkey) -> Result<()> {
+    let statistics_owner = &mut ctx.accounts.statistics_owner;
+    statistics_owner.owner = owner;
+    Ok(())
+}
+
+pub fn admin_close_statistics(_ctx: Context<AdminCloseStatistics>) -> Result<()> {
+    Ok(())
+}
+
 #[derive(Accounts)]
 pub struct ReportAiModelDatasetReward<'info> {
     #[account(mut)]
@@ -90,6 +100,42 @@ pub struct ClaimAiModelDatasetReward<'info> {
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(owner: Pubkey)]
+pub struct AdminInitStatistics<'info> {
+    #[account(
+        init,
+        seeds = [b"statistics", owner.as_ref()],
+        bump,
+        payer = admin,
+        space = 8 + Statistics::INIT_SPACE
+    )]
+    pub statistics_owner: Account<'info, Statistics>,
+
+    #[account(
+        mut,
+        address = admin::ID
+    )]
+    pub admin: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct AdminCloseStatistics<'info> {
+    #[account(
+        mut,
+        close = admin
+    )]
+    pub statistics: Account<'info, Statistics>,
+
+    #[account(
+        mut,
+        address = admin::ID
+    )]
+    pub admin: Signer<'info>,
 }
 
 #[event]
