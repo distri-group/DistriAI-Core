@@ -3,18 +3,21 @@ use crate::errors::DistriAIError;
 use crate::state::machine::*;
 
 pub fn add_machine(ctx: Context<AddMachine>, uuid: [u8; 16], metadata: String) -> Result<()> {
+    // Check if the length of metadata is greater than or equal to the predefined maximum length `Machine::METADATA_MAX_LENGTH`
+    // If not, return `DistriAIError::StringTooLong` error
     require_gte!(
         Machine::METADATA_MAX_LENGTH,
         metadata.len(),
         DistriAIError::StringTooLong
     );
-
+    // Get a mutable reference to the smart contract state data named `machine`
     let machine = &mut ctx.accounts.machine;
     machine.owner = ctx.accounts.owner.key();
     machine.uuid = uuid;
     machine.metadata = metadata;
     machine.status = MachineStatus::Idle;
-
+    
+    // Emit a `MachineEvent` event with the owner and UUID of the newly created machine
     emit!(MachineEvent {
         owner: machine.owner,
         uuid: machine.uuid,
