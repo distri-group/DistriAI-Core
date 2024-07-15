@@ -73,16 +73,27 @@ impl Reward {
     }
 
     pub fn pool(period: u32) -> u64 {
+        // Calculate how many full DECAY_PERIODS fit into the given period
         let decay_times: usize = period
             .saturating_div(Reward::DECAY_PERIODS)
             .try_into()
             .unwrap();
+        
+        // Determine the checkpoint index based on the decay times
         let mut checkpoint_index: usize = decay_times.saturating_div(10).try_into().unwrap();
+        
+        // Ensure checkpoint_index does not exceed the length of POOL_CHECKPOINTS
         if checkpoint_index > Reward::POOL_CHECKPOINTS.len() - 1 {
             checkpoint_index = Reward::POOL_CHECKPOINTS.len() - 1;
         }
+        
+        // Calculate remaining decay times after considering the checkpoint index
         let remaining_decay_times = decay_times.saturating_sub(checkpoint_index.saturating_mul(10));
+        
+        // Initialize the pool with the value from POOL_CHECKPOINTS at checkpoint_index
         let mut pool = Reward::POOL_CHECKPOINTS[checkpoint_index];
+        
+        // Apply decay for the remaining decay times
         for _ in 0..remaining_decay_times {
             pool = pool
                 .saturating_mul(Reward::DECAY_RATE_NUMERATOR)
