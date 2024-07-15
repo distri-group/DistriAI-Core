@@ -9,7 +9,9 @@ const program = anchor.workspace.Errors as anchor.Program<Errors>;
 
 // migrateMachineNew
 const machines = await program.account.machine.all();
+// Iterate over each machine asynchronously
 machines.forEach(async (machine) => {
+  // Generate a new program-derived address (PDA) for each machine
   const [machineNewPDA] = anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from("machine-new"),
@@ -18,6 +20,7 @@ machines.forEach(async (machine) => {
     ],
     program.programId
   );
+  // Call the migrateMachineNew method of the program
   const txHash = await program.methods
     .migrateMachineNew()
     .accounts({
@@ -25,6 +28,7 @@ machines.forEach(async (machine) => {
       machineAfter: machineNewPDA,
     })
     .rpc();
+  // Log the transaction hash after it's executed
   await logTransaction(txHash);
 });
 
