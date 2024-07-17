@@ -24,11 +24,14 @@ describe("Test", () => {
     // addMachine
     let txHash = await program.methods
       .addMachine(uuid, metadata)
+      // Specify the involved accounts, where machinePDA might be the machine's public key
       .accounts({
         machine: machinePDA,
       })
+      // Execute RPC call and get transaction hash
       .rpc();
     console.log(`Use 'solana confirm -v ${txHash}' to see the logs`);
+    // Wait for transaction to confirm on the blockchain
     await program.provider.connection.confirmTransaction(txHash);
 
     // makeOffer
