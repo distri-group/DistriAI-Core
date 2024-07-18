@@ -9,7 +9,9 @@ const program = anchor.workspace.Errors as anchor.Program<Errors>;
 
 // migrateOrderNew
 const orders = await program.account.order.all();
+// Iterate through each order asynchronously
 orders.forEach(async (order) => {
+  // Generate a new program-derived address (PDA) for the order
   const [orderNewPDA] = anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from("order-new"),
@@ -18,6 +20,7 @@ orders.forEach(async (order) => {
     ],
     program.programId
   );
+  // Execute a transaction to migrate the order to the new PDA
   const txHash = await program.methods
     .migrateOrderNew()
     .accounts({
