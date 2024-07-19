@@ -26,6 +26,7 @@ pub fn add_machine(ctx: Context<AddMachine>, uuid: [u8; 16], metadata: String) -
 }
 
 pub fn remove_machine(ctx: Context<RemoveMachine>) -> Result<()> {
+    //  Declares a mutable reference to the `machine` object within the `accounts` field of the provided context `ctx`.
     let machine = &mut ctx.accounts.machine;
     require!(
         machine.status != MachineStatus::Renting,
