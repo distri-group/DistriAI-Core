@@ -34,6 +34,10 @@ orders.forEach(async (order) => {
 // migrateOrderRename
 const orderNews = await program.account.orderNew.all();
 orderNews.forEach(async (orderNew) => {
+  // Derive the Program Derived Address (PDA) for the order using the buyer's public key and order ID.
+  // The PDA is generated using the 'findProgramAddressSync' method from the anchor.web3 library.
+  // The seeds for the PDA include a buffer with the string "order", the buyer's public key as a buffer,
+  // and the order ID as a Uint8Array.
   const [orderPDA] = anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from("order"),
