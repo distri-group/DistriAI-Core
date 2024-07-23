@@ -40,6 +40,14 @@ pub fn remove_machine(ctx: Context<RemoveMachine>) -> Result<()> {
     Ok(())
 }
 
+// Define a public function `make_offer` to make an offer for renting a machine.
+// Parameters:
+// ctx - the program context, which includes access to the machine account
+// price - the price offered for renting the machine as a 64-bit unsigned integer
+// max_duration - the maximum duration for the rental as a 32-bit unsigned integer
+// disk - the disk space required for the rental as a 32-bit unsigned integer
+// Returns:
+// Result<()> - an Ok result if the operation is successful, or an Err result with an error if not
 pub fn make_offer(ctx: Context<MakeOffer>, price: u64, max_duration: u32, disk: u32) -> Result<()> {
     let machine = &mut ctx.accounts.machine;
     require!(
