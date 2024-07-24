@@ -40,6 +40,12 @@ pub fn migrate_machine_rename(ctx: Context<MigrationMachineRename>) -> Result<()
     Ok(())
 }
 
+/// Defines a structure for migrating a machine account to a new version.
+///
+/// The `Accounts` macro is used to automatically handle account de/serialization and provide
+/// convenient access to account information within the program.
+///
+/// `'info` is a lifetime specifier that indicates the data lives as long as the program execution.
 #[derive(Accounts)]
 pub struct MigrationMachineNew<'info> {
     #[account(
