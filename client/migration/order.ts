@@ -58,9 +58,11 @@ orderNews.forEach(async (orderNew) => {
 
 // logTransaction
 async function logTransaction(txHash) {
+  // Retrieve the latest blockhash and the last valid block height from the Solana cluster
   const { blockhash, lastValidBlockHeight } =
     await program.provider.connection.getLatestBlockhash();
 
+  // Confirm the transaction by providing the blockhash, lastValidBlockHeight, and the transaction signature
   await program.provider.connection.confirmTransaction({
     blockhash,
     lastValidBlockHeight,
