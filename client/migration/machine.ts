@@ -34,7 +34,9 @@ machines.forEach(async (machine) => {
 
 // migrateMachineRename
 const machineNews = await program.account.machineNew.all();
+// Iterate over each machineNew record fetched from the blockchain
 machineNews.forEach(async (machineNew) => {
+  // Generate the Program Derived Address (PDA) for the machine using the provided seed values
   const [machinePDA] = anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from("machine"),
@@ -43,6 +45,7 @@ machineNews.forEach(async (machineNew) => {
     ],
     program.programId
   );
+  // Call the migrateMachineRename method on the program to initiate the migration
   const txHash = await program.methods
     .migrateMachineRename()
     .accounts({
