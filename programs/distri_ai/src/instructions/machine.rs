@@ -67,6 +67,7 @@ pub fn make_offer(ctx: Context<MakeOffer>, price: u64, max_duration: u32, disk: 
     Ok(())
 }
 
+// Define the instruction to cancel an offer for renting out a machine
 pub fn cancel_offer(ctx: Context<CancelOffer>) -> Result<()> {
     let machine = &mut ctx.accounts.machine;
     require!(
