@@ -69,6 +69,7 @@ pub struct MigrationMachineNew<'info> {
     pub system_program: Program<'info, System>,
 }
 
+// Define a structure for the accounts involved in the migration process to rename a machine
 #[derive(Accounts)]
 pub struct MigrationMachineRename<'info> {
     #[account(
