@@ -41,6 +41,7 @@ pub fn create_dataset(
     Ok(())
 }
 
+// Define a public function `remove_dataset` that takes a `Context` with a `RemoveDataset` instruction.
 pub fn remove_dataset(ctx: Context<RemoveDataset>) -> Result<()> {
     let dataset = &mut ctx.accounts.dataset;
 
