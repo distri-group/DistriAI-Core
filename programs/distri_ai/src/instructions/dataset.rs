@@ -74,6 +74,8 @@ pub struct CreateDataset<'info> {
     pub system_program: Program<'info, System>,
 }
 
+// The `RemoveDataset` struct is a collection of accounts that will be used in a Solana program instruction.
+// It is derived from the `Accounts` macro, which provides functionality for automatically handling account relationships and transactions.
 #[derive(Accounts)]
 pub struct RemoveDataset<'info> {
     #[account(
