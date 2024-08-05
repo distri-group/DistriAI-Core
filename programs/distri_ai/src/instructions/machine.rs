@@ -86,6 +86,12 @@ pub fn cancel_offer(ctx: Context<CancelOffer>) -> Result<()> {
 #[derive(Accounts)]
 #[instruction(uuid: [u8; 16])]
 pub struct AddMachine<'info> {
+    // Define an account for the `Machine` type.
+    // The `init` attribute indicates that this account should be initialized if it does not exist.
+    // The `seeds` attribute specifies the seeds used to generate the program address for this account.
+    // The `bump` attribute is used to generate a unique address in case of seed collisions.
+    // The `payer` attribute specifies which account will pay for the account creation.
+    // The `space` attribute specifies the amount of space to allocate for the account.
     #[account(
         init,
         seeds = [b"machine", owner.key().as_ref(), uuid.as_ref()],
