@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::state::order::*;
 
+// Define a public function `migrate_order_new` that migrates order information from one account to another.
 pub fn migrate_order_new(ctx: Context<MigrationOrderNew>) -> Result<()> {
     let order_before = &mut ctx.accounts.order_before;
     let order_after = &mut ctx.accounts.order_after;
