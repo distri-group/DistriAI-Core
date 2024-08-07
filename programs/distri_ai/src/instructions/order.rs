@@ -8,6 +8,7 @@ use crate::errors::DistriAIError;
 use crate::state::machine::*;
 use crate::state::order::*;
 
+/// Places an order to rent a machine, handling payment and updating machine status.
 pub fn place_order(
     ctx: Context<PlaceOrder>,
     order_id: [u8; 16],
