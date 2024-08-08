@@ -41,6 +41,7 @@ mod distri_ai {
         instructions::machine::cancel_offer(ctx)
     }
 
+    // submit_task is a public function that submits a task to the system.
     pub fn submit_task(
         ctx: Context<SubmitTask>,
         uuid: [u8; 16],
