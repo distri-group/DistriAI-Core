@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::state::machine::*;
 
+// Define a public function to handle the migration of machine data to a new structure
 pub fn migrate_machine_new(ctx: Context<MigrationMachineNew>) -> Result<()> {
     let machine_before = &mut ctx.accounts.machine_before;
     let machine_after = &mut ctx.accounts.machine_after;
