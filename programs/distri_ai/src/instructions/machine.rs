@@ -25,6 +25,8 @@ pub fn add_machine(ctx: Context<AddMachine>, uuid: [u8; 16], metadata: String) -
     Ok(())
 }
 
+// Defines a public function `remove_machine` that takes a context `ctx` with a `RemoveMachine` type.
+// The function attempts to remove a machine and returns a Result indicating success or failure.
 pub fn remove_machine(ctx: Context<RemoveMachine>) -> Result<()> {
     //  Declares a mutable reference to the `machine` object within the `accounts` field of the provided context `ctx`.
     let machine = &mut ctx.accounts.machine;
