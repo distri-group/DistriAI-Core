@@ -70,6 +70,7 @@ pub fn place_order(
     Ok(())
 }
 
+// RenewOrder renews an existing order by extending its duration and updating the total price.
 pub fn renew_order(ctx: Context<RenewOrder>, duration: u32) -> Result<()> {
     let order = &mut ctx.accounts.order;
     require!(
