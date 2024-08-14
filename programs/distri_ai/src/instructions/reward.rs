@@ -8,6 +8,7 @@ use crate::errors::DistriAIError;
 use crate::state::machine::*;
 use crate::state::reward::*;
 
+//  Deposits an amount into the reward pool.
 pub fn reward_pool_deposit(ctx: Context<RewardPoolDeposit>, amount: u64) -> Result<()> {
     let cpi_context = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
