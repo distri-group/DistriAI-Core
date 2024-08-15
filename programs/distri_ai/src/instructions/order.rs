@@ -113,6 +113,7 @@ pub fn renew_order(ctx: Context<RenewOrder>, duration: u32) -> Result<()> {
     Ok(())
 }
 
+// The start_order function updates the status of an order to 'Training' and records the start time.
 pub fn start_order(ctx: Context<StartOrder>) -> Result<()> {
     let order = &mut ctx.accounts.order;
     require!(
