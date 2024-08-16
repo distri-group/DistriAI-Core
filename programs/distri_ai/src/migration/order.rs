@@ -26,6 +26,8 @@ pub fn migrate_order_new(ctx: Context<MigrationOrderNew>) -> Result<()> {
     Ok(())
 }
 
+// Define a public function `migrate_order_rename` that handles the migration of an order record
+// by renaming it in the context of a Solana program.
 pub fn migrate_order_rename(ctx: Context<MigrationOrderRename>) -> Result<()> {
     let order_before = &mut ctx.accounts.order_before;
     let order_after = &mut ctx.accounts.order_after;
