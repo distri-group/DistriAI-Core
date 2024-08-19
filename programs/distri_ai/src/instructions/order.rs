@@ -133,6 +133,7 @@ pub fn start_order(ctx: Context<StartOrder>) -> Result<()> {
     Ok(())
 }
 
+// refund_order is a Solana program function to process a refund for an order.
 pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {
     let order = &mut ctx.accounts.order;
     require!(
