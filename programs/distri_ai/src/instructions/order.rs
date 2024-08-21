@@ -332,6 +332,7 @@ pub fn order_failed(ctx: Context<OrderFailed>, metadata: String) -> Result<()> {
     Ok(())
 }
 
+// Define the remove_order function which is called to remove an order
 pub fn remove_order(ctx: Context<RemoveOrder>) -> Result<()> {
     let order = &mut ctx.accounts.order;
     require!(
