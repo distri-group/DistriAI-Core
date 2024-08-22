@@ -4,6 +4,7 @@ use crate::state::machine::*;
 use crate::state::reward::*;
 use crate::state::task::*;
 
+// submit_task is a public function to submit a new task to the system.
 pub fn submit_task(
     ctx: Context<SubmitTask>,
     uuid: [u8; 16],
