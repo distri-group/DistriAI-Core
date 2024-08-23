@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 use crate::errors::DistriAIError;
 use crate::state::machine::*;
 
+/// Adds a new machine to the smart contract with the given UUID and metadata.
 pub fn add_machine(ctx: Context<AddMachine>, uuid: [u8; 16], metadata: String) -> Result<()> {
     // Check if the length of metadata is greater than or equal to the predefined maximum length `Machine::METADATA_MAX_LENGTH`
     // If not, return `DistriAIError::StringTooLong` error
