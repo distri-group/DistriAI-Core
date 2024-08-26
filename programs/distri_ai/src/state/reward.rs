@@ -61,7 +61,8 @@ impl Reward {
         29_000_000_000,
         22_000_000_000,
     ];
-
+    // current_period calculates the current reward period based on the current Unix timestamp.
+    // It returns a Result with a u32 representing the current period or an error if the operation fails.
     pub fn current_period() -> Result<u32> {
         let now_ts = Clock::get()?.unix_timestamp;
         let period: u32 = now_ts
