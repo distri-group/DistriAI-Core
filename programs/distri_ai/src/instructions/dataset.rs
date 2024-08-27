@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 use crate::errors::DistriAIError;
 use crate::state::dataset::*;
 
+// Define a public function to create a new dataset
 pub fn create_dataset(
     ctx: Context<CreateDataset>,
     name: String,
