@@ -232,6 +232,7 @@ pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {
     Ok(())
 }
 
+// Define a public function `order_completed` to handle the completion of an order.
 pub fn order_completed(ctx: Context<OrderCompleted>, metadata: String, score: u8) -> Result<()> {
     require_gte!(
         Order::METADATA_MAX_LENGTH,
