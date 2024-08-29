@@ -286,6 +286,7 @@ pub fn order_completed(ctx: Context<OrderCompleted>, metadata: String, score: u8
     Ok(())
 }
 
+// order_failed is a function that handles the failure of an order and performs necessary state updates and token transfers.
 pub fn order_failed(ctx: Context<OrderFailed>, metadata: String) -> Result<()> {
     require_gte!(
         Order::METADATA_MAX_LENGTH,
