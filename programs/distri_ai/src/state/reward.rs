@@ -72,7 +72,7 @@ impl Reward {
             .unwrap();
         Ok(period)
     }
-
+    /// Calculates the pool value after applying decay for a given period.
     pub fn pool(period: u32) -> u64 {
         // Calculate how many full DECAY_PERIODS fit into the given period
         let decay_times: usize = period
