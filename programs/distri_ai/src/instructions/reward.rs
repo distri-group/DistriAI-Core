@@ -23,6 +23,7 @@ pub fn reward_pool_deposit(ctx: Context<RewardPoolDeposit>, amount: u64) -> Resu
     Ok(())
 }
 
+/// Processes a reward claim for a specific period.
 pub fn claim(ctx: Context<Claim>, period: u32) -> Result<()> {
     require_gt!(
         Reward::current_period()?,
