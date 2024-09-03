@@ -354,6 +354,7 @@ pub fn remove_order(ctx: Context<RemoveOrder>) -> Result<()> {
 #[derive(Accounts)]
 #[instruction(order_id: [u8; 16])]
 pub struct PlaceOrder<'info> {
+    // Mutable reference to the Machine account
     #[account(mut)]
     pub machine: Box<Account<'info, Machine>>,
 
