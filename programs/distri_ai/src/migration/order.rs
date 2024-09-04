@@ -47,6 +47,7 @@ pub fn migrate_order_rename(ctx: Context<MigrationOrderRename>) -> Result<()> {
     Ok(())
 }
 
+// Define a Rust struct to represent the accounts involved in a migration order process.
 #[derive(Accounts)]
 pub struct MigrationOrderNew<'info> {
     #[account(
