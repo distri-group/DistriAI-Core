@@ -351,6 +351,8 @@ pub fn remove_order(ctx: Context<RemoveOrder>) -> Result<()> {
     Ok(())
 }
 
+// The `derive(Accounts)` macro generates a struct that represents a group of Solana accounts.
+// The `instruction` attribute specifies a parameter that will be passed to the program.
 #[derive(Accounts)]
 #[instruction(order_id: [u8; 16])]
 pub struct PlaceOrder<'info> {
