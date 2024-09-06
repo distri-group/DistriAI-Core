@@ -21,6 +21,7 @@ pub fn migrate_machine_new(ctx: Context<MigrationMachineNew>) -> Result<()> {
     Ok(())
 }
 
+// Public function to handle the migration of a machine's data with a name change
 pub fn migrate_machine_rename(ctx: Context<MigrationMachineRename>) -> Result<()> {
     let machine_before = &mut ctx.accounts.machine_before;
     let machine_after = &mut ctx.accounts.machine_after;
