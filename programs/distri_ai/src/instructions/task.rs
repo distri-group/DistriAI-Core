@@ -61,6 +61,7 @@ pub fn submit_task(
     Ok(())
 }
 
+// The #[derive(Accounts)] macro is used to automatically generate code for handling Solana program accounts.
 #[derive(Accounts)]
 #[instruction(uuid: [u8; 16], period: u32)]
 pub struct SubmitTask<'info> {
