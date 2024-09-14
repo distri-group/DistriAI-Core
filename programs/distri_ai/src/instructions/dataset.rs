@@ -55,6 +55,7 @@ pub fn remove_dataset(ctx: Context<RemoveDataset>) -> Result<()> {
 
 #[derive(Accounts)]
 #[instruction(name: String)]
+// Define a public struct `CreateDataset` with a lifetime parameter `'info` for use in Solana programs.
 pub struct CreateDataset<'info> {
     #[account(
         init,
